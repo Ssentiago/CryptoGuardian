@@ -15,12 +15,17 @@
         const loginForm = document.getElementById('loginForm');
         loginForm.addEventListener('submit', async (event) => {
             event.preventDefault();
+            const user = document.getElementById('username').value
+            const password = document.getElementById('password').value
 
-            const formData = new FormData(loginForm);
-            const response = await fetch('/register.html', {
-                method: 'POST',
-                body: formData
-            });
+            const response = await fetch(window.location.href, {
+            method: 'POST',
+            headers: {"Accept": "application/json", "Content-Type": "application/json"},
+            body: JSON.stringify({
+                'user': user,
+                'password': password
+            })
+        });
 
             const responseData = await response.json();
             const Created = responseData.Created;

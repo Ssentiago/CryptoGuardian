@@ -17,11 +17,20 @@
             loginForm.addEventListener('submit', async (event) => {
                 event.preventDefault();
 
-                const formData = new FormData(loginForm);
-                const response = await fetch('/login.html', {
+                username = document.getElementById('username').value
+                password = document.getElementById('password').value
+
+
+
+                const response = await fetch(window.location.href, {
                     method: 'POST',
-                    body: formData
+                    headers: {"Accept": "application/json", "Content-Type": "application/json"},
+                    body: JSON.stringify({
+                        'user': username,
+                        'password': password
+                    })
                 });
+
 
                 const responseData = await response.json();
                 const isAuthenticated = responseData.isValidated;
