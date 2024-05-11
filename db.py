@@ -54,15 +54,13 @@ def check_exists_user(log):
 
 
 def add_new_data(user, service, login, password):
-    if check(user):
-        if check(service):
-            if check(login):
-                db = sqlite3.connect('db.db')
-                password = cipher.encrypt(password.encode('utf-8'))
-                db.execute('''INSERT INTO password(user_id, service, login, password)
+    if check(user) and check(service) and check(login):
+        db = sqlite3.connect('db.db')
+        password = cipher.encrypt(password.encode('utf-8'))
+        db.execute('''INSERT INTO password(user_id, service, login, password)
                                   VALUES ((SELECT id FROM user WHERE login = (?)), (?), (?), (?))''', (user, service, login, password))
 
-                db.commit()
+        db.commit()
 
 
 def delete_data(user, service, login):
@@ -83,5 +81,5 @@ def get_all_data(user):
     for service, login, password in data.fetchall():
         res += 'Service: ' + service + '\n'
         res += 'Login: ' + login + '\n'
-        res += 'Password: ' + password + '\n'
+        res += 'Password: ' + cipher.decrypt(password).decode() + '\n'
     return res
