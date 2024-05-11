@@ -1,0 +1,43 @@
+<body>
+<h3>Create your account here</h3>
+<div>
+    <h4>Enter your login and password. Password must be at least 8 chars, and must include digs and latin letters</h4>
+
+    <form id="loginForm">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username">
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password">
+        <button type="submit">Enter</button>
+    </form>
+
+    <script>function register() {
+        const loginForm = document.getElementById('loginForm');
+        loginForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const formData = new FormData(loginForm);
+            const response = await fetch('/register.html', {
+                method: 'POST',
+                body: formData
+            });
+
+            const responseData = await response.json();
+            const Created = responseData.Created;
+
+            if (Created) {
+                alert('CREATED')
+                window.location.href = '/'
+            }
+            else {
+                alert('Something has went wrong... Сheck your pass and usr again')
+            }
+
+
+        });
+
+    }</script>
+</div>
+<div id="target-div"></div>
+<script>register()</script>
+</body>

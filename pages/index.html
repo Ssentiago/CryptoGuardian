@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Password Manager</title>
+</head>
+<body>
+<div>
+
+    <button onclick="window.location.href = 'login.html'">Login</button>
+    <button onclick="window.location.href = 'register.html'">Register</button>
+
+</div>
+<div id="target-div"></div>
+<script>
+    window.onload = function () {
+        const isLogged = document.cookie.includes('isLogged=true');
+
+        if (isLogged) {
+            window.location.href = '/main.html'
+        }
+    }
+</script>
+
+</body>
+</html>

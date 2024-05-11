@@ -1,0 +1,42 @@
+<body>
+<h1>Login</h1>
+<div>
+    <h4>Enter your login and password from your password store...</h4>
+
+    <form id="loginForm">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username">
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password">
+        <button type="submit">Enter</button>
+    </form>
+
+    <script>
+        function login() {
+            const loginForm = document.getElementById('loginForm');
+            loginForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+
+                const formData = new FormData(loginForm);
+                const response = await fetch('/login.html', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const responseData = await response.json();
+                const isAuthenticated = responseData.isValidated;
+
+                if (isAuthenticated) {
+                    window.location.href = 'main.html'
+                    document.cookie = "isLogged=true; path=/";
+                    document.cookie = "user=" + formData.get('username') + '; path=/';
+                }
+
+
+            });
+        }
+    </script>
+</div>
+<div id="target-div"></div>
+<script>login();</script> <!-- Вызов функции login() -->
+</body>

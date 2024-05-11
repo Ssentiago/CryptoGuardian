@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управление паролями</title>
+
+</head>
+<body>
+<div id="LoggedInContent" style="display: none;">
+    <div class="button-row">
+        <h1>Управление паролями</h1>
+        <button id="unlogin" onclick="unlogin()">Выйти</button>
+    </div>
+    <div class="buttons-container">
+        <div class="button-row">
+            <div class="button-row">
+                <button id="generateButton" onclick="getGeneratedPassword()">Генерация</button>
+                <span id="generatedPassword"></span>
+                <div class="input-container">
+                    <label for="passwordLength">Длина пароля:</label>
+                    <input type="number" id="passwordLength" min="8" max="20" value="12">
+                </div>
+                <label for="includeNumbers"><input type="checkbox" id="includeNumbers"> Включить цифры</label>
+            </div>
+        </div>
+        <div class="button-row">
+            <button id="addNewButton" onclick="AddLoginPassword()">Добавить новую связку логин-пароль в БД</button>
+            <input type="text" id="AddServiceName" placeholder="Имя сервиса">
+            <input type="text" id="AddLogin" placeholder="Логин">
+            <input type="text" id="AddPassword" placeholder="Пароль">
+        </div>
+        <div class="button-row">
+            <button id="deleteButton" onclick="DeleteLoginPassword()">Удалить связку логин-пароль из сервиса</button>
+            <input type="text" id="DeleteServiceName" placeholder="Имя сервиса">
+            <input type="text" id="DeleteLogin" placeholder="Логин">
+        </div>
+        <div class="button-row">
+            <button id="showButton" onclick="getAllData()">Вывести все мои пароли</button>
+            <span id="passwordListContainer"></span>
+        </div>
+    </div>
+</div>
+
+<div id="NotLoggenInContent" style="display: none">
+    <h1>You are not authorised. Please login to access content</h1>
+    <button id="homepage" onclick="window.location.href= '/'">Вернуться на главную</button>
+</div>
+<script>
+    const isLogged = document.cookie.includes('isLogged=true');
+
+    if (isLogged) {
+        document.getElementById('LoggedInContent').style.display = 'block'
+    } else {
+        document.getElementById('NotLoggenInContent').style.display = 'block'
+    }
+
+</script>
+<script> async function getGeneratedPassword() {
+    p_length = document.getElementById('passwordLength').value;
+    include_digs = document.getElementById('includeNumbers').checked;
+    const response = await fetch(window.location.href, {
+        method: 'POST',
+        headers: {"Accept": "application/json", "Content-Type": "application/json"},
+        body: JSON.stringify({
+            'action': 'GeneratePassword',
+            'password_length': p_length,
+            'include_digs': include_digs,
+        })
+    });
+
+    const responseData = await response.json();
+
+    const password = await responseData.password
+
+    const generateOutput = document.getElementById('generatedPassword');
+
+    generateOutput.textContent = password;
+}</script>
+
+<script> async function AddLoginPassword() {
+    alert('hello')
+    serviceName = document.getElementById('AddServiceName').value;
+    login_ = document.getElementById('AddLogin').value;
+    password = document.getElementById('AddPassword').value;
+
+    if (serviceName && login_ && password) {
+        const response = await fetch(window.location.href, {
+            method: 'POST',
+            headers: {"Accept": "application/json", "Content-Type": "application/json"},
+            body: JSON.stringify({
+                'user': getCookie('user'),
+                'action': 'AddNewData',
+                'serviceName': serviceName,
+                'login': login_,
+                'password': password
+            })
+        });
+
+        const responseData = await response.json();
+    } else {
+        alert('Введите что-нибудь в поле ввода!!')
+    }
+
+}</script>
+
+<script> async function DeleteLoginPassword() {
+    alert('hello')
+    serviceName = document.getElementById('DeleteServiceName').value;
+    login_ = document.getElementById('DeleteServiceName').value;
+
+    if (serviceName && login_) {
+        const response = await fetch(window.location.href, {
+            method: 'POST',
+            headers: {"Accept": "application/json", "Content-Type": "application/json"},
+            body: JSON.stringify({
+                'user': getCookie('user'),
+                'action': 'DeleteData',
+                'serviceName': serviceName,
+                'login': login_,
+            })
+        });
+
+        const responseData = await response.json();
+    } else {
+        alert('Введите что-нибудь в поле ввода!!')
+    }
+
+}</script>
+
+<script> async function getAllData() {
+    user = getCookie('user')
+
+
+    const response = await fetch(window.location.href, {
+        method: 'POST',
+        headers: {"Accept": "application/json", "Content-Type": "application/json"},
+        body: JSON.stringify({
+            'user': getCookie('user'),
+            'action': 'getAllData',
+        })
+    });
+
+    const responseData = await response.json();
+    const data = responseData.data;
+    element = document.getElementById('passwordListContainer');
+    element.textContent = data;
+
+}</script>
+<script>function delete_cookie(name) {
+    document.cookie = name + '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+}</script>
+
+<script>function unlogin() {
+    delete_cookie('user')
+    document.cookie = "isLogged=false"
+    window.location.href = '/'
+
+}</script>
+<script>const getCookie = (name) => {
+    return document.cookie.split('; ').reduce((r, v) => {
+        const parts = v.split('=')
+        return parts[0] === name ? decodeURIComponent(parts[1]) : r
+    }, '')
+}</script>
+</body>
+</html>
