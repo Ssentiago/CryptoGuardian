@@ -2,6 +2,18 @@ import hashlib
 import re
 import sqlite3
 
+from cryptography.fernet import Fernet
+from environs import Env
+
+env: Env = Env()
+env.read_env(None)
+
+cipher = Fernet(env('secret').encode('utf-8'))
+
+
+def check(data):
+    return re.fullmatch(r'[A-Za-z0-9]+', data)
+
 
 def check_password(password):
     return re.fullmatch(r'^(?=.+[A-Z])(?=.+[0-9])(?=.+[a-z])(?=\S+$)[0-9a-zA-Z]{8,20}$', password)
@@ -14,46 +26,52 @@ def hash(data):
 def check_enter(log, pas):
     db = sqlite3.connect('db.db')
     pas = hash(pas)
-    password = db.execute('''SELECT login
-                        FROM user
-                        WHERE login = (?) AND login_password = (?)''', (log, pas))
-    return bool(password.fetchone())
+    if check(log):
+        password = db.execute('''SELECT login
+                            FROM user
+                            WHERE login = (?) AND login_password = (?)''', (log, pas))
+        return bool(password.fetchone())
 
 
 def make_new_user(log, pas):
     db = sqlite3.connect('db.db')
+    if check(log):
+        pas = hash(pas)
 
-    pas = hash(pas)
-
-    db.execute('INSERT INTO user(login, login_password)'
-               'VALUES (?, ?)', (log, pas))
+        db.execute('INSERT INTO user(login, login_password)'
+                   'VALUES (?, ?)', (log, pas))
 
     db.commit()
     db.close()
 
 
 def check_exists_user(log):
-    db = sqlite3.connect('db.db')
-    check = db.execute('''SELECT * FROM user WHERE login = (?)''', (log,))
+    if check(log):
+        db = sqlite3.connect('db.db')
+        check = db.execute('''SELECT * FROM user WHERE login = (?)''', (log,))
 
-    return bool(check.fetchall())
+        return bool(check.fetchall())
 
 
 def add_new_data(user, service, login, password):
-    db = sqlite3.connect('db.db')
+    if check(user):
+        if check(service):
+            if check(login):
+                db = sqlite3.connect('db.db')
+                password = cipher.encrypt(password.encode('utf-8'))
+                db.execute('''INSERT INTO password(user_id, service, login, password)
+                                  VALUES ((SELECT id FROM user WHERE login = (?)), (?), (?), (?))''', (user, service, login, password))
 
-    db.execute('''INSERT INTO password(user_id, service, login, password)
-                      VALUES ((SELECT id FROM user WHERE login = (?)), (?), (?), (?))''', (user, service, login, password))
-
-    db.commit()
+                db.commit()
 
 
 def delete_data(user, service, login):
     db = sqlite3.connect('db.db')
-    db.execute('DELETE FROM password '
-               'WHERE user_id = (SELECT id FROM user WHERE login = (?)) '
-               'AND service = (?) AND login = (?)', (user, service, login))
-    db.commit()
+    if check(user) and check(service) and check(login):
+        db.execute('DELETE FROM password '
+                   'WHERE user_id = (SELECT id FROM user WHERE login = (?)) '
+                   'AND service = (?) AND login = (?)', (user, service, login))
+        db.commit()
 
 
 def get_all_data(user):
