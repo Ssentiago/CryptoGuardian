@@ -18,21 +18,30 @@ def check_enter(login, password):
     if check_data(login):
         password = db.execute('''SELECT login
                             FROM user
-                            WHERE login = (?) AND login_password = (?)''', (login, password))
+                            WHERE login = (?) AND password = (?)''', (login, password))
         return bool(password.fetchone())
 
 
-def make_new_user(login, password):
+def make_new_user(login, password, secret):
     db = sqlite3.connect('db.db')
     if check_data(login) and check_password(password):
         password = db_hash(password)
-
-        db.execute('INSERT INTO user(login, login_password)'
-                   'VALUES (?, ?)', (login, password))
+        secret = db_hash(secret)
+        db.execute('INSERT INTO user(login, password, secret)'
+                   'VALUES (?, ?, ?)', (login, password, secret))
 
     db.commit()
 
-print(db_hash('gogogogogogGsd23'))
+
+def forgot_password(login, secret):
+    db = sqlite3.connect('db.db')
+    if check_data(login) and check_data(secret):
+        secret = db_hash(secret)
+        check = db.execute('SELECT * '
+                           'FROM user WHERE login = (?) AND secret = (?)', (login, secret))
+
+        return bool(check.fetchall())
+
 
 def check_exists_user(login):
     if check_data(login):
@@ -72,3 +81,15 @@ def get_all_data(user):
         res += 'Login: ' + login + '\n'
         res += 'Password: ' + cipher.decrypt(password).decode() + '\n'
     return res
+
+
+def change_password(user, password):
+    db = sqlite3.connect('db.db')
+    if check_data(user) and check_password(password):
+        password = db_hash(password)
+        print(password)
+        db.execute('UPDATE user '
+                   'SET password = (?) WHERE login = (?)', (password, user))
+        db.commit()
+        return True
+

@@ -4,48 +4,88 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
     <title>Управление паролями</title>
 
 </head>
 <body>
 <div id="LoggedInContent" style="display: none;">
-    <div class="button-row">
+
+    <div class="container mt-5">
         <h1>Управление паролями</h1>
-        <button id="unlogin" onclick="unlogin()">Выйти</button>
-    </div>
-    <div class="buttons-container">
-        <div class="button-row">
-            <div class="button-row">
-                <button id="generateButton" onclick="getGeneratedPassword()">Генерация</button>
-                <span id="generatedPassword"></span>
-                <div class="input-container">
-                    <label for="passwordLength">Длина пароля:</label>
-                    <input type="number" id="passwordLength" min="8" max="20" value="12">
+        <button id="unlogin" onclick="unlogin()" class="btn btn-danger float-right">Выйти</button>
+
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Длина пароля:</span>
+                    </div>
+                    <input type="number" id="passwordLength" min="8" max="20" value="12" class="form-control">
                 </div>
-                <label for="includeNumbers"><input type="checkbox" id="includeNumbers"> Включить цифры</label>
+                <div class="form-check mb-3">
+                    <input type="checkbox" class="form-check-input" id="includeNumbers">
+                    <label class="form-check-label" for="includeNumbers">Включить цифры</label>
+                </div>
+                <button id="generateButton" onclick="getGeneratedPassword()" class="btn btn-primary">Генерация</button>
+                <span id="generatedPassword" class="mt-3"></span>
+            </div>
+
+            <div class="col-md-6">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Имя сервиса:</span>
+                    </div>
+                    <input type="text" id="AddServiceName" placeholder="Введите имя сервиса" class="form-control">
+                </div>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Логин:</span>
+                    </div>
+                    <input type="text" id="AddLogin" placeholder="Введите логин" class="form-control">
+                </div>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Пароль:</span>
+                    </div>
+                    <input type="text" id="AddPassword" placeholder="Введите пароль" class="form-control">
+                </div>
+                <button id="addNewButton" onclick="AddLoginPassword()" class="btn btn-success">Добавить</button>
             </div>
         </div>
-        <div class="button-row">
-            <button id="addNewButton" onclick="AddLoginPassword()">Добавить новую связку логин-пароль в БД</button>
-            <input type="text" id="AddServiceName" placeholder="Имя сервиса">
-            <input type="text" id="AddLogin" placeholder="Логин">
-            <input type="text" id="AddPassword" placeholder="Пароль">
-        </div>
-        <div class="button-row">
-            <button id="deleteButton" onclick="DeleteLoginPassword()">Удалить связку логин-пароль из сервиса</button>
-            <input type="text" id="DeleteServiceName" placeholder="Имя сервиса">
-            <input type="text" id="DeleteLogin" placeholder="Логин">
-        </div>
-        <div class="button-row">
-            <button id="showButton" onclick="getAllData()">Вывести все мои пароли</button>
-            <span id="passwordListContainer"></span>
+
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Имя сервиса:</span>
+                    </div>
+                    <input type="text" id="DeleteServiceName" placeholder="Введите имя сервиса" class="form-control">
+                </div>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Логин:</span>
+                    </div>
+                    <input type="text" id="DeleteLogin" placeholder="Введите логин" class="form-control">
+                </div>
+                <button id="deleteButton" onclick="DeleteLoginPassword()" class="btn btn-danger">Удалить</button>
+            </div>
+
+            <div class="col-md-6">
+                <button id="showButton" onclick="getAllData()" class="btn btn-primary btn-block">Вывести все пароли</button>
+                <span id="passwordListContainer" class="mt-3"></span>
+            </div>
         </div>
     </div>
 </div>
 
 <div id="NotLoggenInContent" style="display: none">
-    <h1>You are not authorised. Please login to access content</h1>
-    <button id="homepage" onclick="window.location.href= '/'">Вернуться на главную</button>
+    <div class="alert alert-danger text-center mt-5">
+        <h1>ACCESS DENIED</h1>
+        <p>Please log in to access the content.</p>
+        <a href="/" class="btn btn-primary">Go back to the main page</a>
+    </div>
 </div>
 <script>
     const isLogged = document.cookie.includes('isLogged=true');
@@ -80,7 +120,6 @@
 }</script>
 
 <script> async function AddLoginPassword() {
-    alert('hello')
     serviceName = document.getElementById('AddServiceName').value;
     login_ = document.getElementById('AddLogin').value;
     password = document.getElementById('AddPassword').value;
@@ -100,13 +139,12 @@
 
         const responseData = await response.json();
     } else {
-        alert('Введите что-нибудь в поле ввода!!')
+        alert('ENTER SOMETHING IN THE INPUT FIELD')
     }
 
 }</script>
 
 <script> async function DeleteLoginPassword() {
-    alert('hello')
     serviceName = document.getElementById('DeleteServiceName').value;
     login_ = document.getElementById('DeleteServiceName').value;
 
@@ -124,7 +162,7 @@
 
         const responseData = await response.json();
     } else {
-        alert('Введите что-нибудь в поле ввода!!')
+        alert('ENTER SOMETHING IN THE INPUT FIELD')
     }
 
 }</script>

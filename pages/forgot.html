@@ -1,7 +1,7 @@
 <head>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
-    <title>Вход</title>
+    <title>Забыли пароль?</title>
 </head>
 
 
@@ -10,8 +10,8 @@
 <div>
 
 
-    <form id="loginForm" class="container mt-3">
-            <h4>Введите логин и пароль от Вашего хранилища паролей.</h4>
+    <form id="ForgotForm" class="container mt-3">
+        <h4>Введите свой логин и своё секретное слово</h4>
 
         <div class="row mb-3">
             <label for="username" class="col-sm-2 col-form-label">Логин:</label>
@@ -21,25 +21,23 @@
             </div>
         </div>
         <div class="row mb-3">
-            <label for="password" class="col-sm-2 col-form-label">Пароль:</label>
+            <label for="secret" class="col-sm-2 col-form-label">Секретное слово:</label>
             <div class="col-sm-10">
-                <input type="password" class="form-control" id="password" name="password" required>
+                <input class="form-control" id="secret" name="secret" required>
 
+            </div>
         </div>
-</div>
-<button type="submit" class="btn btn-primary">Войти на сайт</button>
-        <button class="btn btn-secondary" onclick="window.location.href = 'forgot.html' ">Забыли пароль?</button>
-</form>
+        <button onclick="forgot()" class="btn btn-primary">Дальше</button>
+
+    </form>
 
 
-<script>
-    function login() {
-        const loginForm = document.getElementById('loginForm');
-        loginForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
+    <script>
+        async function forgot() {
+
 
             username = document.getElementById('username').value
-            password = document.getElementById('password').value
+            secret = document.getElementById('secret').value
 
 
             const response = await fetch(window.location.href, {
@@ -47,7 +45,7 @@
                 headers: {"Accept": "application/json", "Content-Type": "application/json"},
                 body: JSON.stringify({
                     'user': username,
-                    'password': password
+                    'secret': secret
                 })
             });
 
@@ -56,18 +54,17 @@
             const isAuthenticated = responseData.isValidated;
 
             if (isAuthenticated) {
-                window.location.href = 'main.html'
+                window.location.href = 'change_password.html'
                 document.cookie = "isLogged=true; path=/";
-                document.cookie = "user=" + formData.get('username') + '; path=/';
+                document.cookie = "user=" + document.getElementById('username').value + '; path=/';
             } else {
-                alert('check your login and passwords')
+                alert('Cant identify you')
             }
 
 
-        });
-    }
-</script>
+        }
+    </script>
 </div>
 <div id="target-div"></div>
-<script>login();</script> <!-- Вызов функции login() -->
+<script>forgot();</script> <!-- Вызов функции forgot() -->
 </body>
