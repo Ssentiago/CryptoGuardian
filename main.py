@@ -66,12 +66,16 @@ async def post_main(action: dict = Body(...)):
         service = action['serviceName']
         login = action['login']
         password = action['password']
-        add_new_data(user, service, login, password)
+        check = add_new_data(user, service, login, password)
+        print(user)
+        if check:
+            return {'added': True}
     elif action['action'] == 'DeleteData':
         user = action['user']
         service = action['serviceName']
         login = action['login']
         delete_data(user, service, login)
+        return {'deleted': True}
     elif action['action'] == 'getAllData':
         user = action['user']
         res = get_all_data(user)

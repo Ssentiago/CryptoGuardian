@@ -59,6 +59,7 @@ def add_new_data(user, service, login, password):
                                   VALUES ((SELECT id FROM user WHERE login = (?)), (?), (?), (?))''', (user, service, login, password))
 
         db.commit()
+        return True
 
 
 def delete_data(user, service, login):
@@ -82,6 +83,7 @@ def get_all_data(user):
         res += 'Password: ' + cipher.decrypt(password).decode() + '\n'
     return res
 
+print(get_all_data('dsfsedresrsrrsdaa'))
 
 def change_password(user, password):
     db = sqlite3.connect('db.db')

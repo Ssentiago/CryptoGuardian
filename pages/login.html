@@ -58,7 +58,7 @@
             if (isAuthenticated) {
                 window.location.href = 'main.html'
                 document.cookie = "isLogged=true; path=/";
-                document.cookie = "user=" + formData.get('username') + '; path=/';
+                document.cookie = "user=" + document.getElementById('username').value + '; path=/';
             } else {
                 alert('check your login and passwords')
             }
