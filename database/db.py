@@ -13,7 +13,7 @@ cipher = Fernet(env('secret').encode('utf-8'))
 
 
 def create_db():
-    path_to_dir = os.path.join(os.path.dirname(__file__))
+    path_to_dir = os.path.dirname(__file__)
     with sqlite3.connect(os.path.join(path_to_dir, 'db.db')) as conn:
         with open(os.path.join(path_to_dir, 'create.sql')) as file:
             file = file.read()
@@ -116,3 +116,5 @@ def change_password(user, password):
                    'SET password = (?), updated = DATETIME() WHERE login = (?) ', (password, user))
         db.commit()
         return True
+
+
