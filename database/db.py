@@ -1,5 +1,6 @@
-import sqlite3
 import os
+import sqlite3
+
 from cryptography.fernet import Fernet
 from environs import Env
 
@@ -10,11 +11,20 @@ env.read_env(None)
 
 cipher = Fernet(env('secret').encode('utf-8'))
 
+
+def create_db():
+    path_to_dir = os.path.join(os.path.dirname(__file__))
+    with sqlite3.connect(os.path.join(path_to_dir, 'db.db')) as conn:
+        with open(os.path.join(path_to_dir, 'create.sql')) as file:
+            file = file.read()
+            conn.executescript(file)
+
+
 def db_connect():
     path = os.path.join(os.path.dirname(__file__), 'db.db')
-    print(path)
     db = sqlite3.connect(path)
     return db
+
 
 def check_enter(login, password):
     db = db_connect()
@@ -106,5 +116,3 @@ def change_password(user, password):
                    'SET password = (?), updated = DATETIME() WHERE login = (?) ', (password, user))
         db.commit()
         return True
-
-

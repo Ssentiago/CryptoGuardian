@@ -73,7 +73,6 @@ async def post_main(action: dict = Body(...)):
         login = action['login']
         password = action['password']
         check = add_new_data(user, service, login, password)
-        print(user)
         if check:
             return {'added': True}
     elif action['action'] == 'DeleteData':
@@ -120,4 +119,8 @@ async def post_change_password(data: dict = Body(...)):
 
 
 if __name__ == '__main__':
+    if not os.path.exists('database/db.db'):
+        create_db()
+        print('Created db')
+
     uvicorn.run("main:app", host = '127.0.0.1', port = 8000, reload = True)
