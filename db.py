@@ -3,7 +3,7 @@ import sqlite3
 from cryptography.fernet import Fernet
 from environs import Env
 
-from service import check_data, check_password, db_hash
+from service import check_password, db_hash, injectionValidate
 
 env: Env = Env()
 env.read_env(None)
@@ -11,11 +11,12 @@ env.read_env(None)
 cipher = Fernet(env('secret').encode('utf-8'))
 
 
+
 def check_enter(login, password):
     db = sqlite3.connect('db.db')
     password = db_hash(password)
 
-    if check_data(login):
+    if injectionValidate(login):
         login = db_hash(login)
         password = db.execute('''SELECT login
                             FROM user
@@ -25,7 +26,7 @@ def check_enter(login, password):
 
 def make_new_user(login, password, secret):
     db = sqlite3.connect('db.db')
-    if check_data(login) and check_password(password):
+    if injectionValidate(login) and check_password(password):
         login = db_hash(login)
         password = db_hash(password)
         secret = db_hash(secret)
@@ -37,7 +38,7 @@ def make_new_user(login, password, secret):
 
 def forgot_password(login, secret):
     db = sqlite3.connect('db.db')
-    if check_data(login) and check_data(secret):
+    if injectionValidate(login) and injectionValidate(secret):
         login = db_hash(login)
         secret = db_hash(secret)
         check = db.execute('SELECT * '
@@ -47,7 +48,7 @@ def forgot_password(login, secret):
 
 
 def check_exists_user(login):
-    if check_data(login):
+    if injectionValidate(login):
         db = sqlite3.connect('db.db')
         login = db_hash(login)
         check = db.execute('''SELECT * FROM user WHERE login = (?)''', (login,))
@@ -56,10 +57,9 @@ def check_exists_user(login):
 
 
 def add_new_data(user, service, login, password):
-    if check_data(user) and check_data(service) and check_data(login):
+    if injectionValidate(user) and injectionValidate(service) and injectionValidate(login):
         db = sqlite3.connect('db.db')
         user = db_hash(user)
-
         password = cipher.encrypt(password.encode('utf-8'))
         db.execute('''INSERT INTO password(user_id, service, login, password)
                                   VALUES ((SELECT id FROM user WHERE login = (?)), (?), (?), (?))''', (user, service, login, password))
@@ -70,15 +70,13 @@ def add_new_data(user, service, login, password):
 
 def delete_data(user, service, login):
     db = sqlite3.connect('db.db')
-    if check_data(user) and check_data(service) and check_data(login):
+    if injectionValidate(user) and injectionValidate(service) and injectionValidate(login):
         user = db_hash(user)
 
         db.execute('DELETE FROM password '
                    'WHERE user_id = (SELECT id FROM user WHERE login = (?)) '
                    'AND service = (?) AND login = (?)', (user, service, login))
         db.commit()
-
-
 
 
 def get_all_data(user):
@@ -97,11 +95,10 @@ def get_all_data(user):
 
 def change_password(user, password):
     db = sqlite3.connect('db.db')
-    if check_data(user) and check_password(password):
+    if injectionValidate(user) and check_password(password):
         user = db_hash(user)
         password = db_hash(password)
         db.execute('UPDATE user '
                    'SET password = (?) WHERE login = (?)', (password, user))
         db.commit()
         return True
-
