@@ -1,4 +1,3 @@
-CREATE TABLE "password" (id INTEGER PRIMARY KEY, user_id INTEGER, service BLOB, login BLOB, password BLOB);
 CREATE TABLE "user" (
 	"id"	INTEGER,
 	"login"	TEXT,
@@ -7,4 +6,13 @@ CREATE TABLE "user" (
 	"created"	TEXT,
 	"updated"	TEXT,
 	PRIMARY KEY("id" AUTOINCREMENT)
-)
+);
+CREATE TABLE "password" (
+	"id"	INTEGER,
+	"user_id"	INTEGER,
+	"service"	TEXT,
+	"login"	TEXT,
+	"password"	TEXT,
+	PRIMARY KEY("id" AUTOINCREMENT),
+	FOREIGN KEY("user_id") REFERENCES "user"("id") ON DELETE CASCADE
+);
