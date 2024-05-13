@@ -16,6 +16,7 @@ def check_enter(login, password):
     password = db_hash(password)
 
     if check_data(login):
+        login = db_hash(login)
         password = db.execute('''SELECT login
                             FROM user
                             WHERE login = (?) AND password = (?)''', (login, password))
@@ -25,6 +26,7 @@ def check_enter(login, password):
 def make_new_user(login, password, secret):
     db = sqlite3.connect('db.db')
     if check_data(login) and check_password(password):
+        login = db_hash(login)
         password = db_hash(password)
         secret = db_hash(secret)
         db.execute('INSERT INTO user(login, password, secret)'
@@ -36,6 +38,7 @@ def make_new_user(login, password, secret):
 def forgot_password(login, secret):
     db = sqlite3.connect('db.db')
     if check_data(login) and check_data(secret):
+        login = db_hash(login)
         secret = db_hash(secret)
         check = db.execute('SELECT * '
                            'FROM user WHERE login = (?) AND secret = (?)', (login, secret))
@@ -46,6 +49,7 @@ def forgot_password(login, secret):
 def check_exists_user(login):
     if check_data(login):
         db = sqlite3.connect('db.db')
+        login = db_hash(login)
         check = db.execute('''SELECT * FROM user WHERE login = (?)''', (login,))
 
         return bool(check.fetchall())
@@ -54,6 +58,8 @@ def check_exists_user(login):
 def add_new_data(user, service, login, password):
     if check_data(user) and check_data(service) and check_data(login):
         db = sqlite3.connect('db.db')
+        user = db_hash(user)
+
         password = cipher.encrypt(password.encode('utf-8'))
         db.execute('''INSERT INTO password(user_id, service, login, password)
                                   VALUES ((SELECT id FROM user WHERE login = (?)), (?), (?), (?))''', (user, service, login, password))
@@ -65,14 +71,19 @@ def add_new_data(user, service, login, password):
 def delete_data(user, service, login):
     db = sqlite3.connect('db.db')
     if check_data(user) and check_data(service) and check_data(login):
+        user = db_hash(user)
+
         db.execute('DELETE FROM password '
                    'WHERE user_id = (SELECT id FROM user WHERE login = (?)) '
                    'AND service = (?) AND login = (?)', (user, service, login))
         db.commit()
 
 
+
+
 def get_all_data(user):
     db = sqlite3.connect('db.db')
+    user = db_hash(user)
     data = db.execute('SELECT service, login, password '
                       '   FROM password '
                       'WHERE user_id = (SELECT id FROM user WHERE login = (?))', (user,))
@@ -83,13 +94,12 @@ def get_all_data(user):
         res += 'Password: ' + cipher.decrypt(password).decode() + '\n'
     return res
 
-print(get_all_data('dsfsedresrsrrsdaa'))
 
 def change_password(user, password):
     db = sqlite3.connect('db.db')
     if check_data(user) and check_password(password):
+        user = db_hash(user)
         password = db_hash(password)
-        print(password)
         db.execute('UPDATE user '
                    'SET password = (?) WHERE login = (?)', (password, user))
         db.commit()

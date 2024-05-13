@@ -81,9 +81,12 @@ async def post_main(action: dict = Body(...)):
         res = get_all_data(user)
         return {'data': res}
 
+
 @app.get('/forgot.html')
 async def get_forgot():
     return FileResponse('pages/forgot.html')
+
+
 @app.post('/forgot.html')
 async def post_forgot(data: dict = Body(...)):
     user = data['user']
@@ -93,9 +96,11 @@ async def post_forgot(data: dict = Body(...)):
     else:
         return {'isValidated': False}
 
+
 @app.get('/change_password.html')
 async def get_change_password():
     return FileResponse('pages/change_password.html')
+
 
 @app.post('/change_password.html')
 async def post_change_password(data: dict = Body(...)):
@@ -106,6 +111,7 @@ async def post_change_password(data: dict = Body(...)):
         return {'changed': True}
     else:
         return {'changed': False}
+
 
 if __name__ == '__main__':
     uvicorn.run("main:app", host = '127.0.0.1', port = 8000, reload = True)

@@ -2,7 +2,8 @@ import hashlib
 import random
 import re
 import string
-
+import cryptography
+import os
 
 async def generate_password(length: int, include_digs: bool) -> str:
     alphabet = string.ascii_uppercase + string.ascii_lowercase
@@ -22,3 +23,6 @@ def check_password(password):
 
 def db_hash(data):
     return hashlib.sha256(data.encode()).hexdigest()
+
+
+
