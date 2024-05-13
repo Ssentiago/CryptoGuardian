@@ -1,21 +1,23 @@
 import uvicorn
 from fastapi import Body, FastAPI
-from fastapi.responses import FileResponse
+from starlette.responses import HTMLResponse
+from starlette.staticfiles import StaticFiles
 
 from db import *
 from service import generate_password
 
 app = FastAPI()
+app.mount("/static", StaticFiles(directory = "./static"), name = "static")
 
 
 @app.get('/')
 async def home():
-    return FileResponse("pages/index.html")
+    return HTMLResponse(open("static/templates/index.html").read())
 
 
 @app.get('/login.html')
-async def some():
-    return FileResponse("pages/login.html")
+async def login():
+    return HTMLResponse(open("static/templates/login.html").read())
 
 
 @app.post('/login.html')
@@ -30,7 +32,7 @@ async def check_login(data: dict = Body()):
 
 @app.get('/register.html')
 async def register():
-    return FileResponse("pages/register.html")
+    return HTMLResponse(open("static/templates/register.html").read())
 
 
 @app.post('/register.html')
@@ -51,15 +53,19 @@ async def post_register(data: dict = Body(...)):
 
 @app.get('/main.html')
 async def get_main():
-    return FileResponse("pages/main.html")
+    return HTMLResponse(open("static/templates/main.html").read())
 
 
 @app.post('/main.html')
 async def post_main(action: dict = Body(...)):
     if action['action'] == 'GeneratePassword':
         password_length = int(action['password_length'])
+        includeLows = action['includeLows']
+        includeUps = action['includeUps']
         include_digs = action['include_digs']
-        generated_password = await generate_password(password_length, include_digs)
+        include_spec = action['include_spec']
+        generated_password = await generate_password(password_length, includeLows, includeUps,
+                                                     include_digs, include_spec)
         return {'password': generated_password}
     if action['action'] == 'AddNewData':
         user = action['user']
@@ -84,7 +90,7 @@ async def post_main(action: dict = Body(...)):
 
 @app.get('/forgot.html')
 async def get_forgot():
-    return FileResponse('pages/forgot.html')
+    return HTMLResponse(open("static/templates/forgot.html").read())
 
 
 @app.post('/forgot.html')
@@ -99,7 +105,7 @@ async def post_forgot(data: dict = Body(...)):
 
 @app.get('/change_password.html')
 async def get_change_password():
-    return FileResponse('pages/change_password.html')
+    return HTMLResponse(open("static/templates/change_password.html").read())
 
 
 @app.post('/change_password.html')
