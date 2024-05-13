@@ -9,6 +9,7 @@
 * Python 
 * FastApi
 * SQLite
+* SQL
 
 # **Установка**
 
