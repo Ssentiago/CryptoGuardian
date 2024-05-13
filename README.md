@@ -13,7 +13,7 @@
 
 # **Установка**
 
-* git clone \<address>
+* git clone https://github.com/Ssentiago/CryptoGuardian
 * cd CryptoGuardian
 * python3 -m venv \<env name> \[OPTIONAL]
 * pip install -r requirements.txt
