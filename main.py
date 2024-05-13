@@ -3,7 +3,7 @@ from fastapi import Body, FastAPI
 from starlette.responses import HTMLResponse
 from starlette.staticfiles import StaticFiles
 
-from db import *
+from database.db import *
 from service import generate_password
 
 app = FastAPI()

@@ -67,8 +67,6 @@ function register() {
 
 
 async function forgot() {
-
-
     username = document.getElementById('username').value
     secret = document.getElementById('secret').value
 
