@@ -3,6 +3,9 @@ import random
 import re
 import string
 
+from cryptography.fernet import Fernet
+from environs import Env
+
 
 async def generate_password(length: int,
                             includeLows: bool,
@@ -22,6 +25,9 @@ async def generate_password(length: int,
 def injectionValidate(data):
     return re.fullmatch(r'[A-Za-z0-9]+', data)
 
+env: Env = Env()
+env.read_env(None)
+cipher = Fernet(env('secret').encode('utf-8'))
 def check_password(password):
     return bool(re.fullmatch(r'^(?=.+[A-Z])(?=.+[0-9])(?=.+[a-z])(?=\S+$)[0-9a-zA-Z]{8,}$', password))
 

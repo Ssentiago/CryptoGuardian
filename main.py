@@ -24,10 +24,7 @@ async def login():
 async def check_login(data: dict = Body()):
     username = data['user']
     password = data['password']
-    if check_enter(username, password):
-        return {'isValidated': True}
-    else:
-        return {'isValidated': False}
+    return {'isValidated': check_enter(username, password)}
 
 
 @app.get('/register.html')
@@ -40,15 +37,12 @@ async def post_register(data: dict = Body(...)):
     username = data['user']
     password = data['password']
     secret = data['secret']
+    check = False
     if not check_exists_user(username):
-
-        if check_password(password):
-            make_new_user(username, password, secret)
-            return {'Created': True}
-        else:
-            return {'Created': False}
+        check = make_new_user(username, password, secret)
+        return {'Created': check}
     else:
-        return {'Created': False}
+        return {'Created': check}
 
 
 @app.get('/main.html')
@@ -96,10 +90,7 @@ async def get_forgot():
 async def post_forgot(data: dict = Body(...)):
     user = data['user']
     secret = data['secret']
-    if forgot_password(user, secret):
-        return {'isValidated': True}
-    else:
-        return {'isValidated': False}
+    return {'isValidated': forgot_password(user, secret)}
 
 
 @app.get('/change_password.html')
@@ -111,16 +102,8 @@ async def get_change_password():
 async def post_change_password(data: dict = Body(...)):
     user = data['user']
     password = data['password']
-    check = change_password(user, password)
-    if check:
-        return {'changed': True}
-    else:
-        return {'changed': False}
+    return {'changed': change_password(user, password)}
 
 
 if __name__ == '__main__':
-    if not os.path.exists('database/db.db'):
-        create_db()
-        print('Created db')
-
     uvicorn.run("main:app", host = '127.0.0.1', port = 8000, reload = True)

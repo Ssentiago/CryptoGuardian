@@ -67,30 +67,36 @@ function register() {
 
 
 async function forgot() {
-    username = document.getElementById('username').value
-    secret = document.getElementById('secret').value
+
+    form = document.getElementById('ForgotForm')
+
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        username = document.getElementById('username').value
+        secret = document.getElementById('secret').value
 
 
-    const response = await fetch(window.location.href, {
-        method: 'POST',
-        headers: {"Accept": "application/json", "Content-Type": "application/json"},
-        body: JSON.stringify({
-            'user': username,
-            'secret': secret
-        })
-    });
+        const response = await fetch(window.location.href, {
+            method: 'POST',
+            headers: {"Accept": "application/json", "Content-Type": "application/json"},
+            body: JSON.stringify({
+                'user': username,
+                'secret': secret
+            })
+        });
 
 
-    const responseData = await response.json();
-    const isAuthenticated = responseData.isValidated;
+        const responseData = await response.json();
+        const isAuthenticated = responseData.isValidated;
 
-    if (isAuthenticated) {
-        window.location.href = 'change_password.html'
-        document.cookie = "isLogged=true; path=/";
-        document.cookie = "user=" + document.getElementById('username').value + '; path=/';
-    } else {
-        alert('Cant identify you')
-    }
+        if (isAuthenticated) {
+            window.location.href = 'change_password.html'
+            document.cookie = "isLogged=true; path=/";
+            document.cookie = "user=" + document.getElementById('username').value + '; path=/';
+        } else {
+            alert('Cant identify you')
+        }
+    })
 
 
 };
