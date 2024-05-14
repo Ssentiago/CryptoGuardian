@@ -13,6 +13,7 @@
 * FastAPI
 * SQLite
 * SQL
+* SQLAlchemy
 
 # **Установка**
 
