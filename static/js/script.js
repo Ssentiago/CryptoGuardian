@@ -296,9 +296,13 @@ async function getAllData() {
 };
 
 function unlogin() {
-    delete_cookie('user')
-    document.cookie = "isLogged=false"
-    window.location.href = '/'
+    createToast('До встречи!', '', '')
+    setTimeout(function () {
+        delete_cookie('user')
+        document.cookie = "isLogged=false"
+        window.location.href = '/'
+    }, 2000)
+
 
 };
 
