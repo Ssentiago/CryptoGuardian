@@ -23,13 +23,13 @@ async def generate_password(length: int,
     return ''.join(random.choice(alphabet) for _ in range(length))
 
 def injectionValidate(data):
-    return re.fullmatch(r'[A-Za-z0-9]+', data)
+    return re.fullmatch(r'[A-Za-z0-9!@#$%&*_]+', data)
 
 env: Env = Env()
 env.read_env(None)
 cipher = Fernet(env('secret').encode('utf-8'))
 def check_password(password):
-    return bool(re.fullmatch(r'^(?=.+[A-Z])(?=.+[0-9])(?=.+[a-z])(?=\S+$)[0-9a-zA-Z]{8,}$', password))
+    return bool(re.fullmatch(r'^(?=.+[A-Za-z])(?=.+[0-9])(?=\S+$)[0-9a-zA-Z]{8,}$', password))
 
 
 
