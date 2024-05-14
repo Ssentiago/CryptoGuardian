@@ -1,6 +1,6 @@
 import uvicorn
 from fastapi import Body, FastAPI
-from starlette.responses import HTMLResponse
+from starlette.responses import HTMLResponse, FileResponse
 from starlette.staticfiles import StaticFiles
 
 from database.db import *
@@ -12,12 +12,12 @@ app.mount("/static", StaticFiles(directory = "./static"), name = "static")
 
 @app.get('/')
 async def home():
-    return HTMLResponse(open("static/templates/index.html").read())
+    return FileResponse("static/templates/index.html")
 
 
 @app.get('/login.html')
 async def login():
-    return HTMLResponse(open("static/templates/login.html").read())
+    return FileResponse("static/templates/login.html")
 
 
 @app.post('/login.html')
@@ -29,7 +29,7 @@ async def check_login(data: dict = Body()):
 
 @app.get('/register.html')
 async def register():
-    return HTMLResponse(open("static/templates/register.html").read())
+    return FileResponse("static/templates/register.html")
 
 
 @app.post('/register.html')
@@ -47,7 +47,7 @@ async def post_register(data: dict = Body(...)):
 
 @app.get('/main.html')
 async def get_main():
-    return HTMLResponse(open("static/templates/main.html").read())
+    return FileResponse("static/templates/main.html")
 
 
 @app.post('/main.html')
@@ -83,7 +83,7 @@ async def post_main(action: dict = Body(...)):
 
 @app.get('/forgot.html')
 async def get_forgot():
-    return HTMLResponse(open("static/templates/forgot.html").read())
+    return FileResponse("static/templates/forgot.html")
 
 
 @app.post('/forgot.html')
@@ -95,7 +95,7 @@ async def post_forgot(data: dict = Body(...)):
 
 @app.get('/change_password.html')
 async def get_change_password():
-    return HTMLResponse(open("static/templates/change_password.html").read())
+    return FileResponse("static/templates/change_password.html")
 
 
 @app.post('/change_password.html')
