@@ -21,11 +21,15 @@ function login() {
         const isAuthenticated = responseData.isValidated;
 
         if (isAuthenticated) {
-            window.location.href = 'main.html'
-            document.cookie = "isLogged=true; path=/";
-            document.cookie = "user=" + document.getElementById('username').value + '; path=/';
+            createToast('Вы успешно вошли в систему', 'Сейчас вы будете перенаправлены на главную страницу')
+            setTimeout(function () {
+                document.cookie = "isLogged=true; path=/";
+                document.cookie = "user=" + document.getElementById('username').value + '; path=/';
+                window.location.href = 'main.html'
+            }, 3000)
+
         } else {
-            alert('check your login and passwords')
+            createToast('Что-то пошло не так...', 'Проверьте логин и пароль', 'error');
         }
 
 
@@ -54,10 +58,14 @@ function register() {
         const Created = responseData.Created;
 
         if (Created) {
-            alert('CREATED')
-            window.location.href = '/'
+            createToast('Аккаунт успешно создан', 'Сейчас вы будете перенаправлены на главную страницу')
+
+            setTimeout(function () {
+                window.location.href = '/'
+
+            }, 5000)
         } else {
-            alert('Something has went wrong... Сheck your pass and usr again')
+            createToast('Что-то пошло не так...', 'Возможно, пользователь уже существует или ваш ввод содержит запрещённые символы', 'error')
         }
 
 
@@ -90,11 +98,15 @@ async function forgot() {
         const isAuthenticated = responseData.isValidated;
 
         if (isAuthenticated) {
-            window.location.href = 'change_password.html'
-            document.cookie = "isLogged=true; path=/";
-            document.cookie = "user=" + document.getElementById('username').value + '; path=/';
+            createToast('Валидация прошла успешно', 'Сейчас вы будете перенаправлены на страницу смены пароля')
+            setTimeout(function () {
+                document.cookie = "isLogged=true; path=/";
+                document.cookie = "user=" + document.getElementById('username').value + '; path=/';
+                window.location.href = 'change_password.html'
+            }, 2000)
+
         } else {
-            alert('Cant identify you')
+            createToast('Пользователь не найден в системе', 'Попробуйте ещё раз', 'error')
         }
     })
 
@@ -112,14 +124,14 @@ function change_pass() {
         const password2 = document.getElementById('pass2').value;
 
         if (password1 !== password2) {
-            alert('Passwords dont match');
+            createToast('Пароли не совпадают', '', 'error')
         } else {
             const response = await fetch(window.location.href, {
                 method: 'POST',
                 headers: {"Accept": "application/json", "Content-Type": "application/json"},
                 body: JSON.stringify({
                     'user': getCookie('user'),
-                    'password': password1 // Используем password1 вместо неопределенной переменной username
+                    'password': password1
                 })
             });
 
@@ -127,11 +139,14 @@ function change_pass() {
             const changed = responseData.changed;
 
             if (changed) {
-                alert('changed');
-                window.location.href = 'main.html';
-                document.cookie = "isLogged=true; path=/";
+                createToast('Смена пароля произошла успешно', 'Сейчас вы будете перенаправлены на главную страницу')
+                setTimeout(function () {
+                    document.cookie = "isLogged=true; path=/";
+                    window.location.href = 'main.html';
+                }, 2000)
+
             } else {
-                alert('Something has went wrong. Check your password.')
+                createToast('Что-то пошло не так...', 'Проверьте введённые данные', 'error')
             }
         }
     });
@@ -169,7 +184,7 @@ async function getGeneratedPassword() {
     include_spec = document.getElementById('includeSpecialSymbols').checked;
     check = includeLows || includeUps || include_digs || include_spec;
     if (!check) {
-        generateOutput.textContent = 'Вы не отметили ни одного чекбокса!'
+        createToast('Вы не отметили ни одного чекбокса', '', 'warning')
     } else {
         const response = await fetch(window.location.href, {
             method: 'POST',
@@ -177,8 +192,8 @@ async function getGeneratedPassword() {
             body: JSON.stringify({
                 'action': 'GeneratePassword',
                 'password_length': p_length,
-                'includeLows': includeLows,
-                'includeUps': includeUps,
+                'include_lows': includeLows,
+                'include_ups': includeUps,
                 'include_digs': include_digs,
                 'include_spec': include_spec,
             })
@@ -196,9 +211,12 @@ async function getGeneratedPassword() {
 };
 
 async function AddLoginPassword() {
-    serviceName = document.getElementById('AddServiceName').value;
-    login_ = document.getElementById('AddLogin').value;
-    password = document.getElementById('AddPassword').value;
+    el1 = document.getElementById('AddServiceName')
+    el2 = document.getElementById('AddLogin')
+    el3 = document.getElementById('AddPassword')
+    serviceName = el1.value
+    login_ = el2.value;
+    password = el3.value;
 
     if (serviceName && login_ && password) {
         const response = await fetch(window.location.href, {
@@ -215,17 +233,24 @@ async function AddLoginPassword() {
 
         const responseData = await response.json();
         if (responseData.added) {
-            alert('added')
+            createToast('Данные были успешно добавлены в базу')
+            el1.value = ''
+            el2.value = ''
+            el3.value = ''
+        } else {
+            createToast('Что-то пошло не так...', 'Проверьте введённые данные', 'error')
         }
     } else {
-        alert('ENTER SOMETHING IN THE INPUT FIELD')
+        createToast('Заполните все поля ввода', '', 'warning')
     }
 
 };
 
 async function DeleteLoginPassword() {
-    serviceName = document.getElementById('DeleteServiceName').value;
-    login_ = document.getElementById('DeleteLogin').value;
+    el1 = document.getElementById('DeleteServiceName')
+    el2 = document.getElementById('DeleteLogin')
+    serviceName = el1.value;
+    login_ = el2.value;
 
     if (serviceName && login_) {
         const response = await fetch(window.location.href, {
@@ -241,10 +266,12 @@ async function DeleteLoginPassword() {
 
         const responseData = await response.json();
         if (responseData.deleted) {
-            alert('Deleted')
+            createToast('Данные были успешно удалены из базы')
+            el1.value = ''
+            el2.value = ''
         }
     } else {
-        alert('ENTER SOMETHING IN THE INPUT FIELD')
+        createToast('Заполните все поля ввода!', '', 'warning')
     }
 
 };
@@ -280,3 +307,56 @@ function get_user() {
     name_user = getCookie('user')
     elem.textContent = name_user
 };
+
+
+function confirmDelAllData() {
+    Swal.fire({
+        title: 'Удалить все сохранённые данные?',
+        text: 'Внимание! Эта операция необратима!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Да, удалить',
+        cancelButtonText: 'Отмена'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            delAllData();
+        }
+    });
+};
+
+async function delAllData() {
+
+    const response = await fetch(window.location.href, {
+        method: 'POST',
+        headers: {"Accept": "application/json", "Content-Type": "application/json"},
+        body: JSON.stringify({
+            'user': getCookie('user'),
+            'action': 'delAllData',
+        })
+    });
+
+    const responseData = await response.json();
+    createToast('Удаление данных', 'Все ваши данные успешно удалены из базы');
+
+
+};
+
+function createToast(title, content = '', icon = 'success') {
+    return Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+    }).fire({
+        icon: icon,
+        title: title,
+        text: content
+    });
+}

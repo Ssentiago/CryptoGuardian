@@ -1,11 +1,11 @@
 import uvicorn
 from fastapi import Body, FastAPI
-from starlette.responses import HTMLResponse, FileResponse
+from starlette.responses import FileResponse
 from starlette.staticfiles import StaticFiles
 
 from database.db import *
 from service import generate_password
-
+from logs.log import *
 app = FastAPI()
 app.mount("/static", StaticFiles(directory = "./static"), name = "static")
 
@@ -40,9 +40,7 @@ async def post_register(data: dict = Body(...)):
     check = False
     if not check_exists_user(username):
         check = make_new_user(username, password, secret)
-        return {'Created': check}
-    else:
-        return {'Created': check}
+    return {'Created': check}
 
 
 @app.get('/main.html')
@@ -54,31 +52,35 @@ async def get_main():
 async def post_main(action: dict = Body(...)):
     if action['action'] == 'GeneratePassword':
         password_length = int(action['password_length'])
-        includeLows = action['includeLows']
-        includeUps = action['includeUps']
+        include_lows = action['include_lows']
+        include_ups = action['include_ups']
         include_digs = action['include_digs']
         include_spec = action['include_spec']
-        generated_password = await generate_password(password_length, includeLows, includeUps,
+        generated_password = await generate_password(password_length, include_lows, include_ups,
                                                      include_digs, include_spec)
         return {'password': generated_password}
+
     if action['action'] == 'AddNewData':
         user = action['user']
         service = action['serviceName']
         login = action['login']
         password = action['password']
         check = add_new_data(user, service, login, password)
-        if check:
-            return {'added': True}
-    elif action['action'] == 'DeleteData':
+        return {'added': check}
+
+    if action['action'] == 'DeleteData':
         user = action['user']
         service = action['serviceName']
         login = action['login']
-        delete_data(user, service, login)
-        return {'deleted': True}
-    elif action['action'] == 'getAllData':
+        return {'deleted': delete_data(user, service, login)}
+
+    if action['action'] == 'getAllData':
         user = action['user']
-        res = get_all_data(user)
-        return {'data': res}
+        return {'data': get_all_data(user)}
+
+    if action['action'] == 'delAllData':
+        user = action['user']
+        return {'deleted': del_all_data(user)}
 
 
 @app.get('/forgot.html')

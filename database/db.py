@@ -69,14 +69,16 @@ def delete_data(user, service, login):
             del_data = session.query(Password).filter(Password.user_id == db_user.id,
                                                       Password.service == service,
                                                       Password.login == login).first()
-            session.delete(del_data)
-            session.commit()
+            if del_data:
+                session.delete(del_data)
+                session.commit()
+            return True
 
 
 def get_all_data(user):
     with SessionLocal() as session:
-        user = db_hash(user)
-        query = session.query(Password, User).join(Password, onclause = and_(User.login == user, User.id == Password.user_id))
+        user_login = db_hash(user)
+        query = session.query(Password, User).join(Password, onclause = and_(User.login == user_login, User.id == Password.user_id))
         res = 'Ваши сохранённые данные:\n'
         for password, user in query:
             res += 'Имя сервиса: ' + password.service + '\n'
@@ -84,14 +86,22 @@ def get_all_data(user):
             res += 'Пароль: ' + password.password + '\n'
         return res
 
+def del_all_data(user):
+    with SessionLocal() as session:
+        user_login = db_hash(user)
+        query = session.query(Password).join(User, onclause = and_(User.id == Password.user_id, User.login == user_login)).all()
+        for obj in query:
+            session.delete(obj)
+        session.commit()
+        return True
 
 def change_password(user, password):
     if injectionValidate(user) and check_password(password):
         with SessionLocal() as session:
             user = db_hash(user)
             password = db_hash(password)
-            object = session.query(User).filter(User.login == user).first()
-            object.password = password
+            obj = session.query(User).filter(User.login == user).first()
+            obj.password = password
             session.commit()
             return True
     else:
