@@ -8,17 +8,18 @@
           integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+
     <title>Управление паролями</title>
 
 </head>
-<body onload="get_user()">
+<body onload="getUserName()">
 
 <div id="LoggedInContent" style="display: none;">
 
     <div class="container mt-5">
         <div class="container mt-5">
             <div class="col-12" style="text-align: right">
-                <button id="unlogin" onclick="unlogin()" class="btn btn-danger">Выйти</button>
+                <button id="logout" onclick="logout()" class="btn btn-danger">Выйти</button>
             </div>
             <h1 style="text-align: center;">
                 Добро пожаловать, <span id="catch_user" class="mt-3"></span>!
@@ -50,7 +51,7 @@
                         <label class="form-check-label" for="includeSpecialSymbols">Включить специальные символы<br>Специальные
                             символы включают в себя: !@#$%&*_</label>
                     </div>
-                    <button id="generateButton" onclick="getGeneratedPassword()" class="btn btn-primary">Генерация</button>
+                    <button id="generateButton" onclick="generatePassword()" class="btn btn-primary">Генерация</button>
                     <span id="generatedPassword" class="col-6 mt-3"></span>
                 </div>
 
@@ -73,7 +74,7 @@
                         </div>
                         <input type="text" id="AddPassword" placeholder="Введите пароль" class="form-control">
                     </div>
-                    <button id="addNewButton" onclick="AddLoginPassword()" class="btn btn-success">Добавить</button>
+                    <button id="addNewButton" onclick="addLoginCredentials()" class="btn btn-success">Добавить</button>
                 </div>
             </div>
 
@@ -91,21 +92,22 @@
                         </div>
                         <input type="text" id="DeleteLogin" placeholder="Введите логин" class="form-control">
                     </div>
-                    <button id="deleteButton" onclick="DeleteLoginPassword()" class="btn btn-danger">Удалить</button>
+                    <button id="deleteButton" onclick="deleteLoginCredentials()" class="btn btn-danger">Удалить</button>
                 </div>
 
                 <div class="col-md-6">
                     <div class="row">
                         <div class="col">
-                            <button id="showButton" onclick="getAllData()" class="btn btn-primary me-2 mb-2">Вывести сохранённые данные
+                            <button id="showButton" onclick="retrieveAllLoginCredentials()" class="btn btn-primary me-2 mb-2">Вывести
+                                сохранённые данные
                             </button>
-                            <button id="delAllDataButton" onclick="confirmDelAllData()" class="btn btn-danger mb-2">
+                            <button id="delAllDataButton" onclick="confirmDeleteAllLoginCredentials()" class="btn btn-danger mb-2">
                                 Удалить все сохранённые данные
                             </button>
                         </div>
                     </div>
                     <div class="row">
-                        <div style="background-color: #f0f0f0; border: 1px solid #ccc;"  class="col">
+                        <div style="background-color: #f0f0f0; border: 1px solid #ccc;" class="col">
                             <span id="passwordListContainer" class="mt-3"></span>
                         </div>
                     </div>
@@ -133,6 +135,7 @@
 
 </script>
 
-<script src="static/js/script.js"></script>
+<script src="static/js/main.js"></script>
+
 </body>
 </html>
