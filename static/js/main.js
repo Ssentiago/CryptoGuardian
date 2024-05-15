@@ -356,8 +356,8 @@ function confirmDeleteAllLoginCredentials() {
         text: 'Внимание! Эта операция необратима!',
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
         confirmButtonText: 'Да, удалить',
         cancelButtonText: 'Отмена'
     }).then((result) => {
