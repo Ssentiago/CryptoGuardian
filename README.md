@@ -19,7 +19,7 @@
 
 * git clone https://github.com/Ssentiago/CryptoGuardian
 * cd CryptoGuardian
-* python3 -m venv \<env name> \[OPTIONAL]
+* Настройка виртуальной среды (опционально)
 * pip install -r requirements.txt
 * python3 main.py
 
