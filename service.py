@@ -28,16 +28,16 @@ env.read_env(None)
 cipher = Fernet(env('secret').encode('utf-8'))
 
 
-def check_login(login):
+def regex_login(login):
     return bool(re.fullmatch(r'[0-9a-zA-Z!@#$%&*_.-]{3,}', login))
 
 
-def check_password(password):
+def regex_password(password):
     return bool(re.fullmatch(r'^(?=.+[A-Za-z])(?=.+[0-9])(?=\S+$)[0-9a-zA-Z!@#$%&*_.-]{8,}$', password))
 
 
-def check_secret(secret):
-    return bool(re.fullmatch(r'[0-9a-zA-Zа-яА-Я!@#$%&*_.-]', secret))
+def regex_secret(secret):
+    return bool(re.fullmatch(r'[0-9a-zA-Zа-яА-Я!@#$%&*_.-]+', secret))
 
 
 def db_hash(data):

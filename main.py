@@ -1,6 +1,9 @@
+import logging
+
 import uvicorn
 from fastapi import Body, FastAPI, Request, Response
-from starlette.responses import FileResponse, JSONResponse
+from fastapi.templating import Jinja2Templates
+from starlette.responses import JSONResponse
 from starlette.staticfiles import StaticFiles
 
 from database.db import *
@@ -8,16 +11,21 @@ from service import generate_password
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory = "./static"), name = "static")
+logger = logging.getLogger(__name__)
+templates = Jinja2Templates(directory = "static/templates")
 
 
 @app.get('/')
-async def home():
-    return FileResponse("static/templates/index.html")
+async def home(request: Request):
+    token = request.cookies.get('token')
+    if token and check_token(token):
+        return templates.TemplateResponse('main.html', {"request": request, 'user_name': 'GOTCHA!'})
+    return templates.TemplateResponse('index.html', {"request": request})
 
 
 @app.get('/login.html')
-async def login():
-    return FileResponse("static/templates/login.html")
+async def login(request: Request):
+    return templates.TemplateResponse('login.html', {"request": request})
 
 
 @app.post('/login.html')
@@ -37,8 +45,8 @@ async def check_login(request: Request, data: dict = Body()):
 
 
 @app.get('/register.html')
-async def register():
-    return FileResponse("static/templates/register.html")
+async def register(request: Request):
+    return templates.TemplateResponse('register.html', {"request": request})
 
 
 @app.post('/register.html')
@@ -58,8 +66,11 @@ async def post_register(data: dict = Body(...)):
 
 
 @app.get('/main.html')
-async def get_main():
-    return FileResponse("static/templates/main.html")
+async def get_main(request: Request):
+    token = request.cookies.get('token')
+    if token:
+        user = get_user_name(token)
+        return templates.TemplateResponse('main.html', {"request": request, 'user_name': user})
 
 
 @app.post('/main.html')
@@ -75,7 +86,8 @@ async def post_main(action: dict = Body(...)):
         return {'password': generated_password}
 
     if action['action'] == 'AddNewData':
-        user = action['user']
+        token = action['token']
+        user = get_user_name(token)
         service = action['serviceName']
         login = action['login']
         password = action['password']
@@ -83,23 +95,26 @@ async def post_main(action: dict = Body(...)):
         return {'added': check}
 
     if action['action'] == 'DeleteData':
-        user = action['user']
+        token = action['token']
+        user = get_user_name(token)
         service = action['serviceName']
         login = action['login']
         return {'deleted': delete_data(user, service, login)}
 
     if action['action'] == 'getAllData':
-        user = action['user']
+        token = action['token']
+        user = get_user_name(token)
         return {'data': get_all_data(user)}
 
     if action['action'] == 'delAllData':
-        user = action['user']
+        token = action['token']
+        user = get_user_name(token)
         return {'deleted': del_all_data(user)}
 
 
 @app.get('/forgot.html')
-async def get_forgot():
-    return FileResponse("static/templates/forgot.html")
+async def get_forgot(request: Request):
+    return templates.TemplateResponse('forgot.html', {"request": request})
 
 
 @app.post('/forgot.html')
@@ -118,8 +133,8 @@ async def post_forgot(data: dict = Body(...)):
 
 
 @app.get('/change_password.html')
-async def get_change_password():
-    return FileResponse("static/templates/change_password.html")
+async def get_change_password(request: Request):
+    return templates.TemplateResponse('change_password.html', {"request": request})
 
 
 @app.post('/change_password.html')
@@ -132,6 +147,7 @@ async def post_change_password(data: dict = Body(...)):
         return response
     response.status_code = 403
     return response
+
 
 @app.post('/token')
 def post_token(data: dict = Body(...)):

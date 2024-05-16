@@ -183,19 +183,6 @@ async function requestUserValidation() {
 
 };
 
-async function requestUserName() {
-    token = getCookieValue('token');
-    response = await fetch('/token', {
-        method: 'POST',
-        headers: {"Accept": "application/json", "Content-Type": "application/json"},
-        body: JSON.stringify({
-            'token': token,
-            'nameRequest': true
-        })
-    });
-    responseData = await response.json();
-    return responseData.name;
-};
 
 
 async function generatePassword() {
@@ -257,12 +244,6 @@ function displayToast(title, content = '', icon = 'success') {
 };
 
 
-async function getUserName() {
-    let elem = document.getElementById('catch_user')
-    let name_user = await requestUserName()
-    console.log('w' + name_user);
-    elem.textContent = name_user
-};
 
 function getCookieValue(name) {
     return document.cookie.split('; ').reduce((r, v) => {
@@ -290,7 +271,7 @@ async function addLoginCredentials() {
             method: 'POST',
             headers: {"Accept": "application/json", "Content-Type": "application/json"},
             body: JSON.stringify({
-                'user': getCookieValue('user'),
+                'token': getCookieValue('token'),
                 'action': 'AddNewData',
                 'serviceName': serviceName,
                 'login': login_,
@@ -324,7 +305,7 @@ async function deleteLoginCredentials() {
             method: 'POST',
             headers: {"Accept": "application/json", "Content-Type": "application/json"},
             body: JSON.stringify({
-                'user': getCookieValue('user'),
+                'token': getCookieValue('token'),
                 'action': 'DeleteData',
                 'serviceName': serviceName,
                 'login': login_,
@@ -344,13 +325,12 @@ async function deleteLoginCredentials() {
 };
 
 async function retrieveAllLoginCredentials() {
-    let user = getCookieValue('user')
 
     const response = await fetch(window.location.href, {
         method: 'POST',
         headers: {"Accept": "application/json", "Content-Type": "application/json"},
         body: JSON.stringify({
-            'user': getCookieValue('user'),
+            'token': getCookieValue('token'),
             'action': 'getAllData',
         })
     });
@@ -385,7 +365,7 @@ async function deleteAllLoginCredentials() {
         method: 'POST',
         headers: {"Accept": "application/json", "Content-Type": "application/json"},
         body: JSON.stringify({
-            'user': getCookieValue('user'),
+            'token': getCookieValue('token'),
             'action': 'delAllData',
         })
     });
@@ -395,10 +375,3 @@ async function deleteAllLoginCredentials() {
 };
 
 
-async function showAuthorizationContent() {
-    if (await requestUserValidation() === true) {
-        document.getElementById('loggedInContent').style.display = 'block'
-    } else {
-        document.getElementById('NotloggedInContent').style.display = 'block'
-    }
-}

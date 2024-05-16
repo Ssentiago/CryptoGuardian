@@ -12,7 +12,7 @@
     <title>Управление паролями</title>
 
 </head >
-<body onload="getUserName()">
+<body >
 
 <div id="LoggedInContent" style="display: none;">
 
@@ -22,7 +22,7 @@
                 <button id="logout" onclick="logout()" class="btn btn-danger">Выйти</button>
             </div>
             <h1 style="text-align: center;">
-                Добро пожаловать, <span id="catch_user" class="mt-3"></span>!
+                Добро пожаловать, <span id="catch_user" class="mt-3">{{ user_name }}</span>!
             </h1>
 
 
