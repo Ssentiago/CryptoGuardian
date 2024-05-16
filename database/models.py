@@ -32,7 +32,6 @@ class User(Base):
 
 
 
-
 class Password(Base):
     __tablename__ = 'password'
     id = Column(Integer, primary_key = True, autoincrement = True)

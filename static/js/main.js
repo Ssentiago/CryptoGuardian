@@ -71,7 +71,7 @@ function createAccount() {
 
 async function validateUserForPasswordReset() {
 
-    let form = document.getElementById('ForgotForm')
+    let form = document.getElementById('forgotForm')
 
     form.addEventListener('submit', async (event) => {
         event.preventDefault();

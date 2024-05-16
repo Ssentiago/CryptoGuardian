@@ -12,26 +12,27 @@
 <div>
 
 
-    <form id="ForgotForm" class="container mt-3">
-        <h4>Введите свой логин и своё секретное слово</h4>
 
-        <div class="row mb-3">
-            <label for="username" class="col-sm-2 col-form-label">Логин:</label>
-            <div class="col-sm-10">
-                <input type="text" class="form-control" id="username" name="username" required>
-
+    <div class="container mt-3">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <h4 class="text-center mb-4">Введите свой логин и своё секретное слово</h4>
+                <form id="forgotForm">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Логин:</label>
+                        <input type="text" class="form-control" id="username" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="secret" class="form-label">Секретное слово:</label>
+                        <input type="text" class="form-control" id="secret" name="secret" required>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Продолжить</button>
+                    </div>
+                </form>
             </div>
         </div>
-        <div class="row mb-3">
-            <label for="secret" class="col-sm-2 col-form-label">Секретное слово:</label>
-            <div class="col-sm-10">
-                <input class="form-control" id="secret" name="secret" required>
-
-            </div>
-        </div>
-        <button type="submit" class="btn btn-primary">Дальше</button>
-
-    </form>
+    </div>
 
 
 </div>
