@@ -26,7 +26,7 @@ class User(Base):
     updated = Column(String)
 
     def __init__(self, login, password, secret):
-        self.login = db_hash(login)
+        self.login = login
         self.password = db_hash(password)
         self.secret = db_hash(secret)
 
@@ -53,5 +53,13 @@ class Password(Base):
             return cipher.decrypt(value).decode()
         else:
             return super().__getattribute__(item)
+
+
+class Token(Base):
+    __tablename__ = 'token'
+    id = Column(Integer, primary_key = True, autoincrement = True)
+    user_id = Column(Integer, ForeignKey('user.id'))
+    value = Column(String)
+
 
 Base.metadata.create_all(bind = engine)

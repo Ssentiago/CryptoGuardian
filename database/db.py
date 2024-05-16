@@ -1,18 +1,48 @@
+import secrets
+
 from sqlalchemy import and_
 
-from database.models import Password, SessionLocal, User
+from database.models import Password, SessionLocal, Token, User
 from service import check_password, db_hash, injectionValidate
 
 
 def check_enter(login, password):
     if injectionValidate(login):
         with SessionLocal() as session:
-            login = db_hash(login)
             password = db_hash(password)
-            check = session.query(User).filter(User.login == login, User.password == password).first()
-            return bool(check)
-    else:
+            user = session.query(User).filter(User.login == login, User.password == password).first()
+            if user:
+                return createToken(user.id)
+    return False
+
+
+def createToken(user: int):
+    with SessionLocal() as session:
+        token = Token(user_id = user, value = secrets.token_hex(30))
+        session.add(token)
+        session.commit()
+        return token.value
+
+
+def check_token(token: str):
+    with SessionLocal() as session:
+        token = session.query(Token).filter(Token.value == token).first()
+        if token:
+            return True
         return False
+
+def delete_token(token: str):
+    with SessionLocal() as session:
+        token = session.query(Token).filter(Token.value == token).first()
+        session.delete(token)
+        session.commit()
+        return True
+
+def get_user_name(token: str):
+    with SessionLocal() as session:
+        user = session.query(User).join(Token, and_(token == Token.value, User.id == Token.user_id)).first()
+        if user:
+            return user.login
 
 
 def make_new_user(login, password, secret):
@@ -25,14 +55,14 @@ def make_new_user(login, password, secret):
     else:
         return False
 
+
 def forgot_password(login, secret):
     if all(map(injectionValidate, [login, secret])):
         with SessionLocal() as session:
-            login = db_hash(login)
             secret = db_hash(secret)
-            check = session.query(User).filter(User.login == login, User.secret == secret).first()
-
-            return bool(check)
+            user = session.query(User).filter(User.login == login, User.secret == secret).first()
+            if user:
+                return createToken(user.id)
     else:
         return False
 
@@ -40,7 +70,6 @@ def forgot_password(login, secret):
 def check_exists_user(login):
     if injectionValidate(login):
         with SessionLocal() as session:
-            login = db_hash(login)
             check = session.query(User).filter(User.login == login).first()
             return bool(check)
     else:
@@ -86,6 +115,7 @@ def get_all_data(user):
             res += 'Пароль: ' + password.password + '\n'
         return res
 
+
 def del_all_data(user):
     with SessionLocal() as session:
         user_login = db_hash(user)
@@ -95,13 +125,14 @@ def del_all_data(user):
         session.commit()
         return True
 
-def change_password(user, password):
-    if injectionValidate(user) and check_password(password):
+
+def change_password(token, password):
+    if check_password(password):
         with SessionLocal() as session:
-            user = db_hash(user)
+            user = session.query(User).join(Token, and_(token == Token.value, User.id == Token.user_id)).first()
+
             password = db_hash(password)
-            obj = session.query(User).filter(User.login == user).first()
-            obj.password = password
+            user.password = password
             session.commit()
             return True
     else:

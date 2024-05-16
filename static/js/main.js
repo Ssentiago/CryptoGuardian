@@ -1,10 +1,3 @@
-// В этом блоке расположены функции, работающие с учетной записью пользователя
-// authenticateUser выполняется на экране /login.html и добавляет "прослушиватель" события "submit", в форме отправки учетных данных, затем возвращает результат их проверки на сервере
-// createAccount выполняется на экране /register.html и также добавляет "прослушиватель" события "submit" в форме отправки учетных данных. Возвращает результат операции добавления пользователя в БД
-// validateUserForPasswordReset выполняется на экране /forgot.html и проверяет валидность пользователя по его логину и секретному слову. Если валиден, то пропускает его на экран смены пароля
-// changePassword выполняется на экране /change_passsword.html и меняет пароль пользователя в БД
-// logout выполняется на главном экране при нажатии кнопки "выйти", разлогинивает пользователя и возвращает на главный экран
-
 function authenticateUser() {
     const loginForm = document.getElementById('loginForm');
     loginForm.addEventListener('submit', async (event) => {
@@ -24,19 +17,16 @@ function authenticateUser() {
         });
 
 
-        const responseData = await response.json();
-        const isAuthenticated = responseData.isValidated;
+        const responseData = await response.json()
 
-        if (isAuthenticated) {
+        if (responseData.Authentication) {
             displayToast('Вы успешно вошли в систему', 'Сейчас вы будете перенаправлены на страницу входа')
             setTimeout(function () {
-                document.cookie = "isLogged=true; path=/";
-                document.cookie = "user=" + document.getElementById('username').value + '; path=/';
                 window.location.href = 'main.html'
             }, 3000)
-
         } else {
             displayToast('Что-то пошло не так...', 'Проверьте логин и пароль', 'error');
+
         }
 
 
@@ -61,10 +51,8 @@ function createAccount() {
             })
         });
 
-        const responseData = await response.json();
-        const Created = responseData.Created;
 
-        if (Created) {
+        if (response.status === 200) {
             displayToast('Аккаунт успешно создан', 'Сейчас вы будете перенаправлены на главную страницу')
 
             setTimeout(function () {
@@ -79,6 +67,7 @@ function createAccount() {
     });
 
 };
+
 
 async function validateUserForPasswordReset() {
 
@@ -100,24 +89,21 @@ async function validateUserForPasswordReset() {
         });
 
 
-        const responseData = await response.json();
-        const isAuthenticated = responseData.isValidated;
-
-        if (isAuthenticated) {
+        if (response.status === 200) {
             displayToast('Валидация прошла успешно', 'Сейчас вы будете перенаправлены на страницу смены пароля')
             setTimeout(function () {
-                document.cookie = "isLogged=true; path=/";
-                document.cookie = "user=" + document.getElementById('username').value + '; path=/';
+
                 window.location.href = 'change_password.html'
             }, 2000)
 
         } else {
             displayToast('Пользователь не найден в системе', 'Попробуйте ещё раз', 'error')
         }
-    })
+    });
 
 
 };
+
 
 function changePassword() {
 
@@ -132,22 +118,20 @@ function changePassword() {
         if (password1 !== password2) {
             displayToast('Пароли не совпадают', '', 'error')
         } else {
+
+
             const response = await fetch(window.location.href, {
                 method: 'POST',
                 headers: {"Accept": "application/json", "Content-Type": "application/json"},
                 body: JSON.stringify({
-                    'user': getCookieValue('user'),
+                    'token': getCookieValue('token'),
                     'password': password1
                 })
             });
 
-            const responseData = await response.json();
-            const changed = responseData.changed;
-
-            if (changed) {
+            if (response.status === 200) {
                 displayToast('Смена пароля произошла успешно', 'Сейчас вы будете перенаправлены на главную страницу')
                 setTimeout(function () {
-                    document.cookie = "isLogged=true; path=/";
                     window.location.href = 'main.html';
                 }, 2000)
 
@@ -161,21 +145,57 @@ function changePassword() {
 
 function logout() {
     displayToast('До встречи!', '', '')
-    setTimeout(function () {
-        deleteCookie('user')
-        document.cookie = "isLogged=false"
+    setTimeout(async function () {
+
+        const response = await fetch('/token', {
+            method: 'POST',
+            headers: {"Accept": "application/json", "Content-Type": "application/json"},
+            body: JSON.stringify({
+                'token': getCookieValue('token'),
+                'deleteRequest': true
+            })
+        });
+        deleteCookie('token')
+        deleteCookie('AuthenticationData')
         window.location.href = '/'
-    }, 2000)
+    }, 2000);
 
 
 };
 
-// в этом блоке расположены функции сервисного назначения
-// generatePassword - генерирует пароль по полученным из формы критериям
-// displayToast - отображает для пользователя всплывающее уведомление
-// getUserName - маленькая функция, единственное её назначение - получить имя пользователя, который сейчас залогинен и отобразить его в приветствии на главном экране
-// getCookieValue - извлекает значение имени пользователя из куки
-// deleteCookie - удаляет куки с именем пользователя
+
+async function requestUserValidation() {
+    token = getCookieValue('token');
+    response = await fetch('/token', {
+        method: 'POST',
+        headers: {"Accept": "application/json", "Content-Type": "application/json"},
+        body: JSON.stringify({
+            'token': token,
+        })
+    });
+
+    if (response.status === 200) {
+        return true
+    } else {
+        return false
+    }
+
+
+};
+
+async function requestUserName() {
+    token = getCookieValue('token');
+    response = await fetch('/token', {
+        method: 'POST',
+        headers: {"Accept": "application/json", "Content-Type": "application/json"},
+        body: JSON.stringify({
+            'token': token,
+            'nameRequest': true
+        })
+    });
+    responseData = await response.json();
+    return responseData.name;
+};
 
 
 async function generatePassword() {
@@ -209,12 +229,8 @@ async function generatePassword() {
                 'include_spec': include_spec,
             })
         });
-
         const responseData = await response.json();
-
         const password = await responseData.password
-
-
         generateOutput.textContent = password;
     }
 
@@ -240,30 +256,26 @@ function displayToast(title, content = '', icon = 'success') {
     });
 };
 
-function getUserName() {
+
+async function getUserName() {
     let elem = document.getElementById('catch_user')
-    let name_user = getCookieValue('user')
+    let name_user = await requestUserName()
+    console.log('w' + name_user);
     elem.textContent = name_user
 };
 
-const getCookieValue = (name) => {
+function getCookieValue(name) {
     return document.cookie.split('; ').reduce((r, v) => {
         const parts = v.split('=');
         return parts[0] === name ? decodeURIComponent(parts[1]) : r;
-    }, '');
+    }, '')
 };
+
 
 function deleteCookie(name) {
     document.cookie = name + '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
 };
 
-
-// функции в этом блоке оперируют с данными пользователя в БД
-// addLoginCredentials - добавляет связку "сервис-логин-пароль" в БД
-// deleteLoginCredentials - удаляет связку "сервис-логин-пароль" из БД на основании связки "сервис-логин"
-// retrieveAllLoginCredentials - выводит все сохранённые данные пользователя из БД
-// confirmDeleteAllLoginCredentials - выводит подтверждение при попытке пользователя запустить процесс удаления всех его данных из БД
-// deleteAllLoginCredentials - запускает процесс удаления всех данных пользователя из БД
 
 async function addLoginCredentials() {
     let el1 = document.getElementById('AddServiceName')
@@ -382,3 +394,11 @@ async function deleteAllLoginCredentials() {
     displayToast('Удаление данных', 'Все ваши данные успешно удалены из базы');
 };
 
+
+async function showAuthorizationContent() {
+    if (await requestUserValidation() === true) {
+        document.getElementById('loggedInContent').style.display = 'block'
+    } else {
+        document.getElementById('NotloggedInContent').style.display = 'block'
+    }
+}

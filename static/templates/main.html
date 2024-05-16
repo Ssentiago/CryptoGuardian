@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="ru">
-<head>
+<head >
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,7 +11,7 @@
 
     <title>Управление паролями</title>
 
-</head>
+</head >
 <body onload="getUserName()">
 
 <div id="LoggedInContent" style="display: none;">
@@ -124,18 +124,17 @@
         <a href="/" class="btn btn-primary">Вернуться на экран входа</a>
     </div>
 </div>
-<script>
-    const isLogged = document.cookie.includes('isLogged=true');
 
-    if (isLogged) {
+
+<script src="static/js/main.js"></script>
+<script>
+    if (requestUserValidation()) {
         document.getElementById('LoggedInContent').style.display = 'block'
     } else {
         document.getElementById('NotLoggenInContent').style.display = 'block'
     }
-
 </script>
 
-<script src="static/js/main.js"></script>
 
 </body>
 </html>
