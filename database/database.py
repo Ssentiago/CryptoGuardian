@@ -73,16 +73,17 @@ def check_exists_user(login):
     if regex_login(login):
         with SessionLocal() as session:
             check = session.query(User).filter(User.login == login).first()
-            return bool(check)
+            return not bool(check)
     else:
         return False
 
 
 def add_new_data(user, service, login, password):
     with SessionLocal() as session:
-        check = session.query(Password).filter(Password.service == service, Password.login == login).first()
+        db_user = session.query(User).filter(User.login == user).first()
+        check = session.query(Password).filter(db_user.id == Password.user_id, Password.service == service,
+                                               Password.login == login).first()
         if not check:
-            db_user = session.query(User).filter(User.login == user).first()
             db_password = Password(user_id = db_user.id, service = service, login = login, password = password)
             session.add(db_password)
             session.commit()
@@ -105,13 +106,9 @@ def delete_data(user, service, login):
 
 def get_all_data(user):
     with SessionLocal() as session:
-        query = session.query(Password, User).join(Password, onclause = and_(User.login == user, User.id == Password.user_id))
-        res = 'Ваши сохранённые данные:\n'
-        for password, user in query:
-            res += 'Имя сервиса: ' + password.service + '\n'
-            res += 'Логин: ' + password.login + '\n'
-            res += 'Пароль: ' + password.password + '\n'
-        return res
+        query = session.query(Password, User).join(Password, onclause = and_(User.login == user, User.id == Password.user_id)).all()
+        data = list(map(lambda x: (x[0].service, x[0].login, x[0].password), query))
+        return data
 
 
 def del_all_data(user):

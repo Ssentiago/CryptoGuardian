@@ -19,6 +19,9 @@
                 <div class="mb-3">
                     <label for="password" class="form-label">Пароль:</label>
                     <input type="password" class="form-control" id="password" name="password" required>
+                    <label>
+                        <input type="checkbox" onclick="toggdlePassword('password')"> Показать пароль
+                    </label>
                 </div>
                 <div class="d-grid gap-2">
                     <button type="submit" class="btn btn-primary">Войти на сайт</button>
@@ -31,5 +34,8 @@
 
 <script src="static/js/main.js"></script>
 <script>authenticateUser()</script>
+
+
+
 
 </body>

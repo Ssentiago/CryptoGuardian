@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="ru">
-<head >
+<head>
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,130 +11,126 @@
 
     <title>Управление паролями</title>
 
-</head >
-<body >
+</head>
+<body>
 
-<div id="LoggedInContent" style="display: none;">
 
+<div class="container mt-5">
     <div class="container mt-5">
-        <div class="container mt-5">
-            <div class="col-12" style="text-align: right">
-                <button id="logout" onclick="logout()" class="btn btn-danger">Выйти</button>
-            </div>
-            <h1 style="text-align: center;">
-                Добро пожаловать, <span id="catch_user" class="mt-3">{{ user_name }}</span>!
-            </h1>
+        <div class="col-12" style="text-align: right">
+            <button id="logout" onclick="logout()" class="btn btn-danger">Выйти</button>
+        </div>
+        <h1 style="text-align: center;">
+            Добро пожаловать, <span id="catch_user" class="mt-3">{{ user_name }}</span>!
+        </h1>
+        <h3 style="text-align: center">
+            {% if count_passwords == 0 %}
+            У вас пока не сохранено никаких паролей
+            {% elif count_passwords == 1 %}
+            У вас сохранён {{ count_passwords }} пароль
+            {% elif count_passwords % 10 > 1 and count_passwords % 10 < 5 %}
+            У вас сохранено {{ count_passwords }} пароля
+            {% else %}
+            У вас сохранено {{ count_passwords }} паролей
+        {% endif %}
+        </h3>
 
 
-            <div class="row mt-3">
-                <div class="col-md-6">
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text">Длина пароля:</span>
-                        </div>
-                        <input type="number" id="passwordLength" min="8" max="40" value="12" class="form-control">
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Длина пароля:</span>
                     </div>
-                    <div class="form-check mb-3">
-                        <input type="checkbox" class="form-check-input" id="includeLows">
-                        <label class="form-check-label" for="includeLows">Включить латинские буквы нижнего регистра</label>
-                    </div>
-                    <div class="form-check mb-3">
-                        <input type="checkbox" class="form-check-input" id="includeUps">
-                        <label class="form-check-label" for="includeUps">Включить латинские буквы верхнего регистра</label>
-                    </div>
-                    <div class="form-check mb-3">
-                        <input type="checkbox" class="form-check-input" id="includeNumbers">
-                        <label class="form-check-label" for="includeNumbers">Включить цифры</label>
-                    </div>
-                    <div class="form-check mb-3">
-                        <input type="checkbox" class="form-check-input" id="includeSpecialSymbols">
-                        <label class="form-check-label" for="includeSpecialSymbols">Включить специальные символы<br>Специальные
-                            символы включают в себя: !@#$%&*_</label>
-                    </div>
-                    <button id="generateButton" onclick="generatePassword()" class="btn btn-primary">Генерация</button>
-                    <span id="generatedPassword" class="col-6 mt-3"></span>
+                    <input type="number" id="passwordLength" min="8" max="40" value="12" class="form-control">
                 </div>
-
-                <div class="col-md-6">
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text">Имя сервиса:</span>
-                        </div>
-                        <input type="text" id="AddServiceName" placeholder="Введите имя сервиса" class="form-control">
-                    </div>
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text">Логин:</span>
-                        </div>
-                        <input type="text" id="AddLogin" placeholder="Введите логин" class="form-control">
-                    </div>
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text">Пароль:</span>
-                        </div>
-                        <input type="text" id="AddPassword" placeholder="Введите пароль" class="form-control">
-                    </div>
-                    <button id="addNewButton" onclick="addLoginCredentials()" class="btn btn-success">Добавить</button>
+                <div class="form-check mb-3">
+                    <input type="checkbox" class="form-check-input" id="includeLows">
+                    <label class="form-check-label" for="includeLows">Включить латинские буквы нижнего регистра</label>
                 </div>
+                <div class="form-check mb-3">
+                    <input type="checkbox" class="form-check-input" id="includeUps">
+                    <label class="form-check-label" for="includeUps">Включить латинские буквы верхнего регистра</label>
+                </div>
+                <div class="form-check mb-3">
+                    <input type="checkbox" class="form-check-input" id="includeNumbers">
+                    <label class="form-check-label" for="includeNumbers">Включить цифры</label>
+                </div>
+                <div class="form-check mb-3">
+                    <input type="checkbox" class="form-check-input" id="includeSpecialSymbols">
+                    <label class="form-check-label" for="includeSpecialSymbols">Включить специальные символы<br>Специальные
+                        символы включают в себя: !@#$%&*_.-</label>
+                </div>
+                <button id="generateButton" onclick="generatePassword()" class="btn btn-primary">Генерация</button>
+
+                    <span  style="background-color: #f0f0f0; border: 1px solid #ccc;" id="generatedPassword" class="col-6 mt-3"></span>
+
             </div>
 
-            <div class="row mt-3">
-                <div class="col-md-6">
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text">Имя сервиса:</span>
-                        </div>
-                        <input type="text" id="DeleteServiceName" placeholder="Введите имя сервиса" class="form-control">
+            <div class="col-md-6">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Имя сервиса:</span>
                     </div>
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text">Логин:</span>
-                        </div>
-                        <input type="text" id="DeleteLogin" placeholder="Введите логин" class="form-control">
-                    </div>
-                    <button id="deleteButton" onclick="deleteLoginCredentials()" class="btn btn-danger">Удалить</button>
+                    <input type="text" id="AddServiceName" placeholder="Введите имя сервиса" class="form-control">
                 </div>
-
-                <div class="col-md-6">
-                    <div class="row">
-                        <div class="col">
-                            <button id="showButton" onclick="retrieveAllLoginCredentials()" class="btn btn-primary me-2 mb-2">Вывести
-                                сохранённые данные
-                            </button>
-                            <button id="delAllDataButton" onclick="confirmDeleteAllLoginCredentials()" class="btn btn-danger mb-2">
-                                Удалить все сохранённые данные
-                            </button>
-                        </div>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Логин:</span>
                     </div>
-                    <div class="row">
-                        <div style="background-color: #f0f0f0; border: 1px solid #ccc;" class="col">
-                            <span id="passwordListContainer" class="mt-3"></span>
-                        </div>
+                    <input type="text" id="AddLogin" placeholder="Введите логин" class="form-control">
+                </div>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Пароль:</span>
+                    </div>
+                    <input type="text" id="AddPassword" placeholder="Введите пароль" class="form-control">
+                </div>
+                <button id="addNewButton" onclick="addLoginCredentials()" class="btn btn-success">Добавить</button>
+            </div>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Имя сервиса:</span>
+                    </div>
+                    <input type="text" id="DeleteServiceName" placeholder="Введите имя сервиса" class="form-control">
+                </div>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Логин:</span>
+                    </div>
+                    <input type="text" id="DeleteLogin" placeholder="Введите логин" class="form-control">
+                </div>
+                <button id="deleteButton" onclick="deleteLoginCredentials()" class="btn btn-danger">Удалить</button>
+            </div>
+
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col">
+                        <button id="showButton" onclick="retrieveAllLoginCredentials()" class="btn btn-primary me-2 mb-2">Вывести
+                            сохранённые данные
+                        </button>
+                        <button id="delAllDataButton" onclick="confirmDeleteAllLoginCredentials()" class="btn btn-danger mb-2">
+                            Удалить все сохранённые данные
+                        </button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div style="background-color: #f0f0f0; border: 1px solid #ccc;" class="col">
+                        <span id="passwordListContainer" class="mt-3"></span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<div id="NotLoggenInContent" style="display: none">
-    <div class="alert alert-danger text-center mt-5">
-        <h1>ДОСТУП ЗАПРЕЩЁН</h1>
-        <p>Пожалуйста, войдите в систему, чтобы получить доступ к контенту</p>
-        <a href="/" class="btn btn-primary">Вернуться на экран входа</a>
-    </div>
 </div>
 
 
 <script src="static/js/main.js"></script>
-<script>
-    if (requestUserValidation()) {
-        document.getElementById('LoggedInContent').style.display = 'block'
-    } else {
-        document.getElementById('NotLoggenInContent').style.display = 'block'
-    }
-</script>
-
 
 </body>
 </html>

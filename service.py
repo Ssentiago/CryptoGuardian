@@ -2,9 +2,11 @@ import hashlib
 import random
 import re
 import string
+from typing import Optional
 
 from cryptography.fernet import Fernet
 from environs import Env
+from starlette.responses import JSONResponse, Response
 
 
 async def generate_password(length: int,
@@ -42,3 +44,19 @@ def regex_secret(secret):
 
 def db_hash(data):
     return hashlib.sha256(data.encode()).hexdigest()
+
+
+def createResponce(init: JSONResponse | Response, status_code, data: Optional[dict] = None,
+                   cookies: Optional[dict[str, str]] = None) -> Response:
+    if data:
+        response = init(data)
+    else:
+        response = init()
+    response.status_code = status_code
+    if cookies:
+        for key, value in cookies.items():
+            response.set_cookie(key, value)
+    return response
+
+def join_data(data: dict[str, str]) -> str:
+    return '\n\n'.join(f"Имя сервиса: {field[0]}\nИмя пользователя: {field[1]}\nПароль: {field[2]}" for field in data)

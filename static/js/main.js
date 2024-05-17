@@ -17,9 +17,7 @@ function authenticateUser() {
         });
 
 
-        const responseData = await response.json()
-
-        if (responseData.Authentication) {
+        if (response.status === 200) {
             displayToast('Вы успешно вошли в систему', 'Сейчас вы будете перенаправлены на страницу входа')
             setTimeout(function () {
                 window.location.href = 'main.html'
@@ -43,7 +41,7 @@ function createAccount() {
 
         const response = await fetch(window.location.href, {
             method: 'POST',
-            headers: {"Accept": "application/json", "Content-Type": "application/json"},
+            headers: {"Accept": "application/json", "Content-Type": "application/json", "Action": "Register"},
             body: JSON.stringify({
                 'user': user,
                 'password': password,
@@ -164,27 +162,6 @@ function logout() {
 };
 
 
-async function requestUserValidation() {
-    token = getCookieValue('token');
-    response = await fetch('/token', {
-        method: 'POST',
-        headers: {"Accept": "application/json", "Content-Type": "application/json"},
-        body: JSON.stringify({
-            'token': token,
-        })
-    });
-
-    if (response.status === 200) {
-        return true
-    } else {
-        return false
-    }
-
-
-};
-
-
-
 async function generatePassword() {
     const generateOutput = document.getElementById('generatedPassword');
     const p_length_field = document.getElementById('passwordLength')
@@ -206,9 +183,8 @@ async function generatePassword() {
     } else {
         const response = await fetch(window.location.href, {
             method: 'POST',
-            headers: {"Accept": "application/json", "Content-Type": "application/json"},
+            headers: {"Accept": "application/json", "Content-Type": "application/json", "Action": "GeneratePassword"},
             body: JSON.stringify({
-                'action': 'GeneratePassword',
                 'password_length': p_length,
                 'include_lows': includeLows,
                 'include_ups': includeUps,
@@ -244,7 +220,6 @@ function displayToast(title, content = '', icon = 'success') {
 };
 
 
-
 function getCookieValue(name) {
     return document.cookie.split('; ').reduce((r, v) => {
         const parts = v.split('=');
@@ -269,10 +244,8 @@ async function addLoginCredentials() {
     if (serviceName && login_ && password) {
         const response = await fetch(window.location.href, {
             method: 'POST',
-            headers: {"Accept": "application/json", "Content-Type": "application/json"},
+            headers: {"Accept": "application/json", "Content-Type": "application/json", "Action": "AddNewData"},
             body: JSON.stringify({
-                'token': getCookieValue('token'),
-                'action': 'AddNewData',
                 'serviceName': serviceName,
                 'login': login_,
                 'password': password
@@ -303,10 +276,8 @@ async function deleteLoginCredentials() {
     if (serviceName && login_) {
         const response = await fetch(window.location.href, {
             method: 'POST',
-            headers: {"Accept": "application/json", "Content-Type": "application/json"},
+            headers: {"Accept": "application/json", "Content-Type": "application/json", "Action": "DeleteData"},
             body: JSON.stringify({
-                'token': getCookieValue('token'),
-                'action': 'DeleteData',
                 'serviceName': serviceName,
                 'login': login_,
             })
@@ -325,14 +296,10 @@ async function deleteLoginCredentials() {
 };
 
 async function retrieveAllLoginCredentials() {
-
     const response = await fetch(window.location.href, {
         method: 'POST',
-        headers: {"Accept": "application/json", "Content-Type": "application/json"},
-        body: JSON.stringify({
-            'token': getCookieValue('token'),
-            'action': 'getAllData',
-        })
+        headers: {"Accept": "application/json", "Content-Type": "application/json", "Action": "getAllData"},
+        body: null
     });
 
     const responseData = await response.json();
@@ -363,15 +330,38 @@ async function deleteAllLoginCredentials() {
 
     const response = await fetch(window.location.href, {
         method: 'POST',
-        headers: {"Accept": "application/json", "Content-Type": "application/json"},
-        body: JSON.stringify({
-            'token': getCookieValue('token'),
-            'action': 'delAllData',
-        })
+        headers: {"Accept": "application/json", "Content-Type": "application/json", "Action": "deleteAllData"},
     });
 
-    const responseData = await response.json();
+
     displayToast('Удаление данных', 'Все ваши данные успешно удалены из базы');
 };
 
+
+function toggdlePassword(id) {
+    let pass = document.getElementById(id)
+    if (pass.type === "password") {
+        pass.type = "text"
+    } else {
+        pass.type = "password"
+    }
+};
+
+async function checkLogin() {
+    let user = document.getElementById('username')
+
+    const response = await fetch(window.location.href, {
+        method: 'POST',
+        headers: {"Accept": "application/json", "Content-Type": "application/json", "Action": "CheckExistsUser"},
+        body: JSON.stringify({
+            'user': user.value,
+        })
+    })
+    el = document.getElementById('checklogin')
+    if (response.status !== 200) {
+        el.textContent = 'Логин не удовлетворяет условиям или пользователь с таким логином уже существует'
+    } else {
+        el.textContent = ''
+    }
+};
 

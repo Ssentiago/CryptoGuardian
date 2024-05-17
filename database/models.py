@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 
 from sqlalchemy import Column, ForeignKey, Integer, String, create_engine
-from sqlalchemy.orm import DeclarativeBase, sessionmaker
+from sqlalchemy.orm import DeclarativeBase, relationship, sessionmaker
 
 from service import cipher, db_hash
 
@@ -59,6 +59,7 @@ class Token(Base):
     id = Column(Integer, primary_key = True, autoincrement = True)
     user_id = Column(Integer, ForeignKey('user.id'))
     value = Column(String)
+
 
 
 Base.metadata.create_all(bind = engine)
