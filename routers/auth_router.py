@@ -1,7 +1,6 @@
 import logging
-from typing import Optional
 
-from fastapi import APIRouter, Body, HTTPException
+from fastapi import APIRouter, Body, Header, HTTPException
 from starlette import status
 from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
@@ -10,7 +9,7 @@ from starlette.templating import Jinja2Templates
 
 from database.database import change_password, check_enter, check_exists_user, check_token, delete_token, forgot_password, get_user_name, \
     make_new_user
-from service import createResponce
+from service import createResponce, regex_login, regex_password
 
 router = APIRouter()
 router.mount("/static", StaticFiles(directory = "./static"), name = "static")
@@ -23,8 +22,6 @@ async def login(request: Request):
     return templates.TemplateResponse('login.html', {"request": request})
 
 
-
-
 @router.post('/login.html')
 async def check_login(request: Request, data: dict = Body()):
     username = data['user']
@@ -33,7 +30,7 @@ async def check_login(request: Request, data: dict = Body()):
     if token:
         return createResponce(JSONResponse, status.HTTP_200_OK, {'Authentication': True}, {'token': token})
     else:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+        raise HTTPException(status_code = status.HTTP_401_UNAUTHORIZED)
 
 
 @router.get('/register.html')
@@ -42,23 +39,13 @@ async def register(request: Request):
 
 
 @router.post('/register.html')
-async def post_register(request: Request, data: dict = Body(...)):
-    if request.headers.get('Action') == "CheckExistsUser":
-        user = data['user']
-        if check_exists_user(user):
-            return createResponce(Response, status.HTTP_200_OK)
-        else:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-
-    elif request.headers.get('Action') == "Register":
-        username = data['user']
-        password = data['password']
-        secret = data['secret']
-        check = False
-        if check_exists_user(username):
-            if make_new_user(username, password, secret):
-                return createResponce(Response, status.HTTP_200_OK)
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+async def post_register(data: dict = Body(...)):
+    username = data['user']
+    password = data['password']
+    secret = data['secret']
+    if make_new_user(username, password, secret):
+        return createResponce(Response, status.HTTP_200_OK)
+    raise HTTPException(status_code = status.HTTP_401_UNAUTHORIZED)
 
 
 @router.post('/token')
@@ -74,7 +61,7 @@ async def post_token(data: dict = Body(...)):
     if userReq:
         userName = get_user_name(token)
         return createResponce(JSONResponse, status.HTTP_200_OK, {'name': userName})
-    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+    raise HTTPException(status_code = status.HTTP_401_UNAUTHORIZED)
 
 
 @router.get('/change_password.html')
@@ -91,7 +78,7 @@ async def post_change_password(data: dict = Body(...)):
     password = data['password']
     if change_password(token, password):
         return createResponce(Response, status.HTTP_200_OK)
-    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+    raise HTTPException(status_code = status.HTTP_401_UNAUTHORIZED)
 
 
 @router.get('/forgot.html')
@@ -106,4 +93,23 @@ async def post_forgot(data: dict = Body(...)):
     token = forgot_password(user, secret)
     if token:
         return createResponce(Response, status.HTTP_200_OK, cookies = {'token': token})
-    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+    raise HTTPException(status_code = status.HTTP_401_UNAUTHORIZED)
+
+
+@router.post('/validate')
+async def post_validate(action: str = Header(...), data: dict = Body(None)):
+    match action:
+        case 'CheckPassword':
+            if regex_password(data['obj']):
+                return createResponce(Response, status.HTTP_200_OK)
+            raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST)
+        case 'CheckLogin':
+            login = data['obj']
+            if check_exists_user(login):
+                if regex_login(login):
+                    return createResponce(Response, status.HTTP_200_OK)
+                else:
+                    return createResponce(JSONResponse, status.HTTP_401_UNAUTHORIZED, {'message': 'Неправильное имя пользователя!'})
+            else:
+                return createResponce(JSONResponse, status.HTTP_401_UNAUTHORIZED,
+                                      {'message': 'Пользователь с таким именем уже существует!'})

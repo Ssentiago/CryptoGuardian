@@ -42,15 +42,14 @@
         <div class="row mb-3">
             <div class="col-md-6">
                 <label for="username" class="form-label">Логин:</label>
-                <input type="text" class="form-control" id="username" name="username" onblur="checkLogin()" required>
-                <label id="checklogin"></label>
+                <input type="text" class="form-control" id="username" name="username" onblur="checkLogin('username')" required>
             </div>
             <div class="col-md-6">
                 <label for="password" class="form-label">Пароль:</label>
-                <input type="password" class="form-control" id="password" name="password" required>
+                <input type="password" class="form-control" id="password" name="password" onblur="checkPassword('password')" required>
                 <label>
                     <input type="checkbox" onclick="toggdlePassword('password')"> Показать пароль
-                </label>
+                </label><br>
 
             </div>
             <div class="col-md-6">

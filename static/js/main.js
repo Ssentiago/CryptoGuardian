@@ -134,7 +134,7 @@ function changePassword() {
                 }, 2000)
 
             } else {
-                displayToast('Что-то пошло не так...', 'Проверьте введённые данные', 'error')
+                displayToast('Ваш пароль содержит некорректные данные', '', 'error')
             }
         }
     });
@@ -347,21 +347,47 @@ function toggdlePassword(id) {
     }
 };
 
-async function checkLogin() {
-    let user = document.getElementById('username')
-
-    const response = await fetch(window.location.href, {
-        method: 'POST',
-        headers: {"Accept": "application/json", "Content-Type": "application/json", "Action": "CheckExistsUser"},
-        body: JSON.stringify({
-            'user': user.value,
+async function checkLogin(log_id) {
+    let user = document.getElementById(log_id).value
+    if (user) {
+        console.log(user)
+        const response = await fetch('/validate', {
+            method: 'POST',
+            headers: {"Accept": "application/json", "Content-Type": "application/json", "Action": "CheckLogin"},
+            body: JSON.stringify({
+                'obj': user,
+            })
         })
-    })
-    el = document.getElementById('checklogin')
-    if (response.status !== 200) {
-        el.textContent = 'Логин не удовлетворяет условиям или пользователь с таким логином уже существует'
-    } else {
-        el.textContent = ''
+        el = document.getElementById('checklogin')
+        if (response.status !== 200) {
+            responceData = await response.json();
+            msg = responceData.message
+            displayToast('Ошибка', msg, 'error')
+        } else {
+            el.textContent = ''
+        }
     }
+
 };
+
+async function checkPassword(pass_id) {
+    const pass = document.getElementById(pass_id)
+    const password = pass.value
+    if (password) {
+        const response = await fetch('/validate', {
+            method: 'POST',
+            headers: {"Accept": "application/json", "Content-Type": "application/json", "Action": "CheckPassword"},
+            body: JSON.stringify({
+                'obj': password
+            })
+        })
+
+        if (response.status !== 200) {
+            displayToast('Ошибка!', 'Пароль некорректен!', 'error')
+        } else {
+            el.textContent = ''
+        }
+    }
+
+}
 

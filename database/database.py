@@ -70,12 +70,10 @@ def forgot_password(login, secret):
 
 
 def check_exists_user(login):
-    if regex_login(login):
         with SessionLocal() as session:
             check = session.query(User).filter(User.login == login).first()
             return not bool(check)
-    else:
-        return False
+
 
 
 def add_new_data(user, service, login, password):
