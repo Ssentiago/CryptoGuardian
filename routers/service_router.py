@@ -19,7 +19,9 @@ templates = Jinja2Templates(directory = "static/templates")
 async def get_main(request: Request, token: Optional[str] = Cookie(None)):
     if token:
         user = get_user_name(token)
-        return templates.TemplateResponse('main.html', {"request": request, 'user_name': user, "count_passwords": len(get_all_data(user))})
+        return templates.TemplateResponse('main.html', {"request": request,
+                                                        'user_name': user,
+                                                        "count_passwords": len(get_all_data(user))})
     else:
         return templates.TemplateResponse('AccessDenied.html', {"request": request})
 
