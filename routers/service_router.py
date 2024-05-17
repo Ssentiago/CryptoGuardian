@@ -23,7 +23,7 @@ async def get_main(request: Request, token: Optional[str] = Cookie(None)):
                                                         'user_name': user,
                                                         "count_passwords": len(get_all_data(user))})
     else:
-        return templates.TemplateResponse('AccessDenied.html', {"request": request})
+        return templates.TemplateResponse('auth/auth_access_denied.html', {"request": request})
 
 
 @router.post('/main.html')

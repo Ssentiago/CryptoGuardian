@@ -17,12 +17,12 @@ logger = logging.getLogger(__name__)
 templates = Jinja2Templates(directory = "static/templates")
 
 
-@router.get('/login.html')
+@router.get('/login')
 async def login(request: Request):
-    return templates.TemplateResponse('login.html', {"request": request})
+    return templates.TemplateResponse('auth/auth_login.html', {"request": request})
 
 
-@router.post('/login.html')
+@router.post('/login')
 async def check_login(request: Request, data: dict = Body()):
     username = data['user']
     password = data['password']
@@ -33,12 +33,12 @@ async def check_login(request: Request, data: dict = Body()):
         raise HTTPException(status_code = status.HTTP_401_UNAUTHORIZED)
 
 
-@router.get('/register.html')
+@router.get('/register')
 async def register(request: Request):
-    return templates.TemplateResponse('register.html', {"request": request})
+    return templates.TemplateResponse('auth/auth_register.html', {"request": request})
 
 
-@router.post('/register.html')
+@router.post('/register')
 async def post_register(data: dict = Body(...)):
     username = data['user']
     password = data['password']
@@ -68,8 +68,8 @@ async def post_token(data: dict = Body(...)):
 async def get_change_password(request: Request):
     token = request.cookies.get('token')
     if token:
-        return templates.TemplateResponse('change_password.html', {"request": request})
-    return templates.TemplateResponse('AccessDenied.html', {"request": request})
+        return templates.TemplateResponse('auth/auth_change_password.html', {"request": request})
+    return templates.TemplateResponse('auth/auth_access_denied.html', {"request": request})
 
 
 @router.post('/change_password.html')
@@ -83,7 +83,7 @@ async def post_change_password(data: dict = Body(...)):
 
 @router.get('/forgot.html')
 async def get_forgot(request: Request):
-    return templates.TemplateResponse('forgot.html', {"request": request})
+    return templates.TemplateResponse('auth/auth_reset_password.html', {"request": request})
 
 
 @router.post('/forgot.html')

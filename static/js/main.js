@@ -91,7 +91,7 @@ async function validateUserForPasswordReset() {
             displayToast('Валидация прошла успешно', 'Сейчас вы будете перенаправлены на страницу смены пароля')
             setTimeout(function () {
 
-                window.location.href = 'change_password.html'
+                window.location.href = 'auth_change_password.html'
             }, 2000)
 
         } else {
