@@ -2,7 +2,7 @@ import secrets
 
 from sqlalchemy import and_
 
-from database.models import Password, SessionLocal, Token, User
+from database.models import Credentials, SessionLocal, Token, User
 from service import db_hash, regex_login, regex_password, regex_secret
 
 
@@ -79,10 +79,10 @@ def check_exists_user(login):
 def add_new_data(user, service, login, password):
     with SessionLocal() as session:
         db_user = session.query(User).filter(User.login == user).first()
-        check = session.query(Password).filter(db_user.id == Password.user_id, Password.service == service,
-                                               Password.login == login).first()
+        check = session.query(Credentials).filter(db_user.id == Credentials.user_id, Credentials.service == service,
+                                               Credentials.login == login).first()
         if not check:
-            db_password = Password(user_id = db_user.id, service = service, login = login, password = password)
+            db_password = Credentials(user_id = db_user.id, service = service, login = login, password = password)
             session.add(db_password)
             session.commit()
 
@@ -93,9 +93,9 @@ def add_new_data(user, service, login, password):
 def delete_data(user, service, login):
     with SessionLocal() as session:
         db_user = session.query(User).filter(User.login == user).first()
-        del_data = session.query(Password).filter(Password.user_id == db_user.id,
-                                                  Password.service == service,
-                                                  Password.login == login).first()
+        del_data = session.query(Credentials).filter(Credentials.user_id == db_user.id,
+                                                  Credentials.service == service,
+                                                  Credentials.login == login).first()
         if del_data:
             session.delete(del_data)
             session.commit()
@@ -104,14 +104,14 @@ def delete_data(user, service, login):
 
 def get_all_data(user):
     with SessionLocal() as session:
-        query = session.query(Password, User).join(Password, onclause = and_(User.login == user, User.id == Password.user_id)).all()
+        query = session.query(Credentials, User).join(Credentials, onclause = and_(User.login == user, User.id == Credentials.user_id)).all()
         data = list(map(lambda x: (x[0].service, x[0].login, x[0].password), query))
         return data
 
 
 def del_all_data(user):
     with SessionLocal() as session:
-        query = session.query(Password).join(User, onclause = and_(User.id == Password.user_id, User.login == user)).all()
+        query = session.query(Credentials).join(User, onclause = and_(User.id == Credentials.user_id, User.login == user)).all()
         for obj in query:
             session.delete(obj)
         session.commit()

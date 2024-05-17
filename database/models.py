@@ -32,8 +32,8 @@ class User(Base):
 
 
 
-class Password(Base):
-    __tablename__ = 'password'
+class Credentials(Base):
+    __tablename__ = 'credentials'
     id = Column(Integer, primary_key = True, autoincrement = True)
     user_id = Column(Integer, ForeignKey('user.id'))
     service = Column(String)
