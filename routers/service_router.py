@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 templates = Jinja2Templates(directory = "static/templates")
 
 
-@router.get('/main.html')
+@router.get('/main')
 async def get_main(request: Request, token: Optional[str] = Cookie(None)):
     if token:
         user = get_user_name(token)
@@ -26,7 +26,7 @@ async def get_main(request: Request, token: Optional[str] = Cookie(None)):
         return templates.TemplateResponse('auth/auth_access_denied.html', {"request": request})
 
 
-@router.post('/main.html')
+@router.post('/main')
 async def post_main(data: Optional[dict] = Body(None), action: str = Header(None), token: Optional[str] = Cookie(None)):
     match action:
         case "GeneratePassword":

@@ -64,7 +64,7 @@ async def post_token(data: dict = Body(...)):
     raise HTTPException(status_code = status.HTTP_401_UNAUTHORIZED)
 
 
-@router.get('/change_password.html')
+@router.get('/change_password')
 async def get_change_password(request: Request):
     token = request.cookies.get('token')
     if token:
@@ -72,7 +72,7 @@ async def get_change_password(request: Request):
     return templates.TemplateResponse('auth/auth_access_denied.html', {"request": request})
 
 
-@router.post('/change_password.html')
+@router.post('/change_password')
 async def post_change_password(data: dict = Body(...)):
     token = data['token']
     password = data['password']
@@ -81,12 +81,12 @@ async def post_change_password(data: dict = Body(...)):
     raise HTTPException(status_code = status.HTTP_401_UNAUTHORIZED)
 
 
-@router.get('/forgot.html')
+@router.get('/forgot')
 async def get_forgot(request: Request):
     return templates.TemplateResponse('auth/auth_reset_password.html', {"request": request})
 
 
-@router.post('/forgot.html')
+@router.post('/forgot')
 async def post_forgot(data: dict = Body(...)):
     user = data['user']
     secret = data['secret']
