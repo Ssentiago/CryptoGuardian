@@ -60,3 +60,4 @@ def createResponce(init: JSONResponse | Response, status_code, data: Optional[di
 
 def join_data(data: dict[str, str]) -> str:
     return '\n\n'.join(f"Имя сервиса: {field[0]}\nИмя пользователя: {field[1]}\nПароль: {field[2]}" for field in data)
+
