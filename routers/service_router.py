@@ -1,12 +1,16 @@
+import datetime
 import logging
+from http import HTTPStatus
 from typing import Optional
 
 from fastapi import APIRouter, Body, Cookie, Header
+from starlette import status
 from starlette.requests import Request
+from starlette.responses import Response
 from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 
-from database.database import add_new_data, del_all_data, delete_data, get_all_data, get_user_name
+from database.database import add_new_data, check_token, del_all_data, delete_data, get_all_data, get_user_name
 from service import generate_password, join_data
 
 router = APIRouter()
@@ -59,3 +63,16 @@ async def post_main(data: Optional[dict] = Body(None), action: str = Header(None
         case "deleteAllData":
             user = get_user_name(token)
             return {'deleted': del_all_data(user)}
+
+
+@router.get('/export')
+async def get_download(token: Optional[str] = Cookie(None)):
+    if check_token(token):
+        user = get_user_name(token)
+        content = join_data(get_all_data(user))
+
+        response = Response(content = content, status_code = status.HTTP_200_OK)
+        response.headers['Content-Type'] = 'text/plain'
+        response.headers['Content-Disposition'] = f'attachment; filename=export_data_{datetime.datetime.now()}.txt'
+
+        return response

@@ -20,7 +20,7 @@ function authenticateUser() {
         if (response.status === 200) {
             displayToast('Вы успешно вошли в систему', 'Сейчас вы будете перенаправлены на страницу входа')
             setTimeout(function () {
-                window.location.href = 'main.html'
+                window.location.href = '/main'
             }, 3000)
         } else {
             displayToast('Что-то пошло не так...', 'Проверьте логин и пароль', 'error');
@@ -91,7 +91,7 @@ async function validateUserForPasswordReset() {
             displayToast('Валидация прошла успешно', 'Сейчас вы будете перенаправлены на страницу смены пароля')
             setTimeout(function () {
 
-                window.location.href = 'auth_change_password.html'
+                window.location.href = '/change_password'
             }, 2000)
 
         } else {
@@ -130,7 +130,7 @@ function changePassword() {
             if (response.status === 200) {
                 displayToast('Смена пароля произошла успешно', 'Сейчас вы будете перенаправлены на главную страницу')
                 setTimeout(function () {
-                    window.location.href = 'main.html';
+                    window.location.href = '/main';
                 }, 2000)
 
             } else {
@@ -181,7 +181,7 @@ async function generatePassword() {
     if (!check) {
         displayToast('Вы не отметили ни одного чекбокса', '', 'warning')
     } else {
-        const response = await fetch(window.location.href, {
+        const response = await fetch('/main', {
             method: 'POST',
             headers: {"Accept": "application/json", "Content-Type": "application/json", "Action": "GeneratePassword"},
             body: JSON.stringify({
@@ -242,7 +242,7 @@ async function addLoginCredentials() {
     let password = el3.value;
 
     if (serviceName && login_ && password) {
-        const response = await fetch(window.location.href, {
+        const response = await fetch('/main', {
             method: 'POST',
             headers: {"Accept": "application/json", "Content-Type": "application/json", "Action": "AddNewData"},
             body: JSON.stringify({
@@ -274,7 +274,7 @@ async function deleteLoginCredentials() {
     let login_ = el2.value;
 
     if (serviceName && login_) {
-        const response = await fetch(window.location.href, {
+        const response = await fetch('/main', {
             method: 'POST',
             headers: {"Accept": "application/json", "Content-Type": "application/json", "Action": "DeleteData"},
             body: JSON.stringify({
@@ -296,7 +296,7 @@ async function deleteLoginCredentials() {
 };
 
 async function retrieveAllLoginCredentials() {
-    const response = await fetch(window.location.href, {
+    const response = await fetch('/main', {
         method: 'POST',
         headers: {"Accept": "application/json", "Content-Type": "application/json", "Action": "getAllData"},
         body: null

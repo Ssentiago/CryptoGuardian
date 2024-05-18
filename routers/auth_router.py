@@ -56,7 +56,7 @@ async def post_token(data: dict = Body(...)):
             return createResponce(Response, status.HTTP_200_OK)
     token = data['token']
     userReq = data.get('nameRequest')
-    if not userReq and check_token(token):
+    if check_token(token):
         return createResponce(Response, status.HTTP_200_OK)
     if userReq:
         userName = get_user_name(token)
