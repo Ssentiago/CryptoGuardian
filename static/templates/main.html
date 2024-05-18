@@ -45,7 +45,7 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text">Длина пароля:</span>
                     </div>
-                    <input type="number" id="passwordLength" min="8" max="40" value="12" class="form-control">
+                    <input type="number" id="passwordLength" min="8" max="50" value="12" class="form-control">
                 </div>
                 <div class="form-check mb-3">
                     <input type="checkbox" class="form-check-input" id="includeLows">
@@ -64,9 +64,15 @@
                     <label class="form-check-label" for="includeSpecialSymbols">Включить специальные символы<br>Специальные
                         символы включают в себя: !@#$%&*_.-</label>
                 </div>
-                <button id="generateButton" onclick="generatePassword()" class="btn btn-primary">Генерация</button>
+                <div class="row align-items-center">
+                    <div class="col-auto">
+                        <button id="generateButton" onclick="generatePassword()" class="btn btn-primary">Генерация</button>
+                    </div>
+                    <div class="col-5">
+                        <span style="background-color: #f0f0f0; border: 1px solid #ccc;" id="generatedPassword" class="col-5 mt-3"></span>
+                    </div>
+                </div>
 
-                <span style="background-color: #f0f0f0; border: 1px solid #ccc;" id="generatedPassword" class="col-6 mt-3"></span>
 
             </div>
 

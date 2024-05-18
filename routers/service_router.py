@@ -74,7 +74,7 @@ async def get_download(token: Optional[str] = Cookie(None)):
     if check_token(token):
         user = get_user_name(token)
         raw_content = get_all_data(user)
-        if len(raw_content) > 1:
+        if len(raw_content) > 0:
             content = generate_csv(raw_content)
             response = Response(content = content, status_code = status.HTTP_200_OK)
             response.headers['Content-Type'] = 'text/csv'

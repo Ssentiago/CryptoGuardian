@@ -304,7 +304,7 @@ async function deleteLoginCredentials() {
 };
 
 async function retrieveAllLoginCredentials() {
-    const response = await fetch('/main', {
+    const response = await fetch(window.location.href, {
         method: 'POST',
         headers: {"Accept": "application/json", "Content-Type": "application/json", "Action": "getAllData"},
         body: null
@@ -312,10 +312,11 @@ async function retrieveAllLoginCredentials() {
 
     const responseData = await response.json();
     let data = responseData.data;
-    data = generateTable(data)
+    table = generateTable(data)
 
     element = document.getElementById('passwordListContainer');
-    element.innerHTML = data;
+
+    element.innerHTML = table;
 };
 
 function confirmDeleteAllLoginCredentials() {
@@ -434,13 +435,15 @@ async function exportData() {
 };
 
 function generateTable(data) {
-    let table = '<table><thead><tr>'
+    let table = '<table><thread><tr>'
+
     data[0].forEach(element => {
         table += '<th>' + element + '</th>'
     })
-    table += '</tr></thead><tbody>';
+    table += '</tr></thread><tbody>';
 
     data.splice(0, 1)
+
     data.forEach(row => {
         table += '<tr>'
 
@@ -451,4 +454,5 @@ function generateTable(data) {
     })
     table += '</tbody></table>'
     return table
-}
+};
+
