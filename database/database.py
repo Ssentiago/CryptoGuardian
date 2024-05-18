@@ -4,7 +4,7 @@ from sqlalchemy import and_
 
 from database.models import Credentials, SessionLocal, Token, User
 from service import db_hash, regex_login, regex_password, regex_secret
-
+from itertools import count
 
 def check_enter(login, password):
     if regex_login(login):
@@ -102,10 +102,11 @@ def delete_data(user, service, login):
         return True
 
 
-def get_all_data(user):
+def get_all_data(user) -> list[tuple[str]]:
     with SessionLocal() as session:
         query = session.query(Credentials, User).join(Credentials, onclause = and_(User.login == user, User.id == Credentials.user_id)).all()
-        data = list(map(lambda x: (x[0].service, x[0].login, x[0].password), query))
+        c = count(1)
+        data = list(map(lambda x: (next(c), x[0].service, x[0].login, x[0].password), query))
         return data
 
 

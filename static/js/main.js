@@ -252,12 +252,16 @@ async function addLoginCredentials() {
             })
         });
 
-        const responseData = await response.json();
-        if (responseData.added) {
-            displayToast('Данные были успешно добавлены в базу')
+        if (response.status === 200) {
             el1.value = ''
             el2.value = ''
             el3.value = ''
+
+            displayToast('Данные были успешно добавлены в базу')
+            setTimeout(async function () {
+                    window.location.reload()
+                }, 1500
+            )
         } else {
             displayToast('Что-то пошло не так...', 'Проверьте введённые данные', 'error')
         }
@@ -283,11 +287,15 @@ async function deleteLoginCredentials() {
             })
         });
 
-        const responseData = await response.json();
-        if (responseData.deleted) {
+
+        if (response.status === 200) {
             displayToast('Данные были успешно удалены из базы')
             el1.value = ''
             el2.value = ''
+            setTimeout(async function () {
+                    window.location.reload()
+                }, 1500
+            )
         }
     } else {
         displayToast('Заполните все поля ввода!', '', 'warning')
@@ -304,7 +312,8 @@ async function retrieveAllLoginCredentials() {
 
     const responseData = await response.json();
     let data = responseData.data;
-    data = data.replace(/\n/g, '<br>');
+    data = generateTable(data)
+
     element = document.getElementById('passwordListContainer');
     element.innerHTML = data;
 };
@@ -333,8 +342,13 @@ async function deleteAllLoginCredentials() {
         headers: {"Accept": "application/json", "Content-Type": "application/json", "Action": "deleteAllData"},
     });
 
-
-    displayToast('Удаление данных', 'Все ваши данные успешно удалены из базы');
+    if (response.status === 200) {
+        displayToast('Удаление данных', 'Все ваши данные успешно удалены из базы');
+        setTimeout(async function () {
+                window.location.reload()
+            }, 1500
+        )
+    }
 };
 
 
@@ -389,5 +403,52 @@ async function checkPassword(pass_id) {
         }
     }
 
-}
+};
 
+async function exportData() {
+    const responce = await fetch('/export', {
+        method: 'GET',
+    });
+
+    if (responce.status === 200) {
+        const blob = await responce.blob()
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.style.display = 'none'
+        a.href = url
+
+        const filename = responce.headers.get('Content-Disposition')
+            .split('filename=')[1]
+            .replace(/"/g, '')
+        a.download = filename
+        document.body.appendChild(a)
+        a.click()
+        window.URL.revokeObjectURL(url)
+    } else if (responce.status === 404) {
+        displayToast('У вас пока нет данных для скачивания', '', 'info')
+    } else {
+        console.log('Произошла ошибка', responce.status)
+        displayToast('Во время скачивания файла произошла ошибка', 'Если подобное повторится, обратитесь к администратору сайта', 'error')
+    }
+
+};
+
+function generateTable(data) {
+    let table = '<table><thead><tr>'
+    data[0].forEach(element => {
+        table += '<th>' + element + '</th>'
+    })
+    table += '</tr></thead><tbody>';
+
+    data.splice(0, 1)
+    data.forEach(row => {
+        table += '<tr>'
+
+        row.forEach(val => {
+            table += '<td>' + val + '</td>'
+        })
+        table += '</tr>'
+    })
+    table += '</tbody></table>'
+    return table
+}

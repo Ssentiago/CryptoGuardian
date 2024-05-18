@@ -1,4 +1,6 @@
+import csv
 import hashlib
+import io
 import random
 import re
 import string
@@ -58,6 +60,11 @@ def createResponce(init: JSONResponse | Response, status_code, data: Optional[di
             response.set_cookie(key, value)
     return response
 
-def join_data(data: dict[str, str]) -> str:
-    return '\n\n'.join(f"Имя сервиса: {field[0]}\nИмя пользователя: {field[1]}\nПароль: {field[2]}" for field in data)
 
+def generate_csv(data: list[tuple[str]]) -> str:
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(('#', 'Имя сервиса', 'Логин', 'Пароль'))
+    writer.writerows(data)
+
+    return output.getvalue()
