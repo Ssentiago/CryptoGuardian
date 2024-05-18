@@ -263,7 +263,7 @@ async function addLoginCredentials() {
                 }, 1500
             )
         } else {
-            displayToast('Что-то пошло не так...', 'Проверьте введённые данные', 'error')
+            displayToast('Что-то пошло не так...', 'Проверьте введённые данные. Возможно, такая связка Сервис-Логин уже есть в базе', 'error')
         }
     } else {
         displayToast('Заполните все поля ввода', '', 'warning')

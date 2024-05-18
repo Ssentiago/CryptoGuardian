@@ -67,6 +67,7 @@ async def post_main(data: Optional[dict] = Body(None), action: str = Header(None
             user = get_user_name(token)
             if del_all_data(user):
                 return createResponce(Response, status_code = status.HTTP_200_OK)
+    return createResponce(Response, status_code = status.HTTP_400_BAD_REQUEST)
 
 
 @router.get('/export')
