@@ -6,7 +6,7 @@ from typing import Optional
 from fastapi import APIRouter, Body, Cookie, Header
 from starlette import status
 from starlette.requests import Request
-from starlette.responses import Response
+from starlette.responses import RedirectResponse, Response
 from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 
@@ -27,7 +27,7 @@ async def get_main(request: Request, token: Optional[str] = Cookie(None)):
                                                         'user_name': user,
                                                         "count_passwords": len(get_all_data(user))})
     else:
-        return templates.TemplateResponse('auth/auth_access_denied.html', {"request": request})
+        return RedirectResponse(url="/accessDenied")
 
 
 @router.post('/main')

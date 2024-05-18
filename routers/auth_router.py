@@ -3,7 +3,7 @@ import logging
 from fastapi import APIRouter, Body, Header, HTTPException
 from starlette import status
 from starlette.requests import Request
-from starlette.responses import JSONResponse, Response
+from starlette.responses import JSONResponse, Response, RedirectResponse
 from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 
@@ -69,7 +69,7 @@ async def get_change_password(request: Request):
     token = request.cookies.get('token')
     if token:
         return templates.TemplateResponse('auth/auth_change_password.html', {"request": request})
-    return templates.TemplateResponse('auth/auth_access_denied.html', {"request": request})
+    return RedirectResponse(url='/accessDenied')
 
 
 @router.post('/change_password')
@@ -113,3 +113,7 @@ async def post_validate(action: str = Header(...), data: dict = Body(None)):
             else:
                 return createResponce(JSONResponse, status.HTTP_401_UNAUTHORIZED,
                                       {'message': 'Пользователь с таким именем уже существует!'})
+
+@router.get('/accessDenied')
+async def get_access_deiden(request: Request):
+    return templates.TemplateResponse('auth/auth_access_denied.html', {"request": request})
