@@ -366,28 +366,28 @@ function toggdlePassword(id) {
     }
 };
 
-async function checkLogin(log_id) {
-    let user = document.getElementById(log_id).value
-    if (user) {
-        console.log(user)
-        const response = await fetch('/validate', {
-            method: 'POST',
-            headers: {"Accept": "application/json", "Content-Type": "application/json", "Action": "CheckLogin"},
-            body: JSON.stringify({
-                'obj': user,
-            })
-        })
-        el = document.getElementById('checklogin')
-        if (response.status !== 200) {
-            responceData = await response.json();
-            msg = responceData.message
-            displayToast('Ошибка', msg, 'error')
-        } else {
-            el.textContent = ''
-        }
-    }
-
-};
+// async function checkLogin(log_id) {
+//     let user = document.getElementById(log_id).value
+//     if (user) {
+//         console.log(user)
+//         const response = await fetch('/validate', {
+//             method: 'POST',
+//             headers: {"Accept": "application/json", "Content-Type": "application/json", "Action": "CheckLogin"},
+//             body: JSON.stringify({
+//                 'obj': user,
+//             })
+//         })
+//         el = document.getElementById('checklogin')
+//         if (response.status !== 200) {
+//             responceData = await response.json();
+//             msg = responceData.message
+//             displayToast('Ошибка', msg, 'error')
+//         } else {
+//             el.textContent = ''
+//         }
+//     }
+//
+// };
 
 
 async function exportData() {
@@ -484,15 +484,17 @@ async function passwordEventsCatcher(event) {
 
             validationCheck = await fetchPasswordValidation(password)
             if (validationCheck) {
-
+                el = document.getElementById('passwordData')
+                container = document.getElementById('passData')
+                container.style.display = 'inline'
+                el.innerHTML = 'Проверяем силу пароля и был ли он слит...'
                 let passwordData = await fetchPasswordStrengthAndPwns(password)
 
                 if (passwordData !== false) {
-                    el = document.getElementById('passwordData')
-                    container = document.getElementById('passData')
-                    container.style.display = 'inline'
-                    output = 'Оценка пароля: ' + passwordData.score + '<br>' + 'pwned: ' +  passwordData.pwned
-                    el.innerHTML = output
+                    setTimeout(async function () {
+                        output = 'Оценка пароля: ' + passwordData.score + '<br>' + 'pwned: ' + passwordData.pwned
+                        el.innerHTML = output
+                    }, 3000)
 
 
                 }
@@ -522,3 +524,133 @@ async function checkPasswords(pass1_id, pass2_id) {
     password2.addEventListener('blur', passwordEventsCatcher)
 };
 
+async function addEventListenersInputs() {
+    // прослушиватели поля логина
+    log_inp = document.getElementById('username')
+    log_inp.addEventListener('focus', function () {
+        el = document.getElementById('requirements')
+        el.setAttribute('open', '')
+    })
+    log_inp.addEventListener('blur', function () {
+        el = document.getElementById('requirements')
+        el.removeAttribute('open')
+    })
+    log_inp.addEventListener('input', logTooltips)
+    // прослушиватели полей пароля
+    pass1 = document.getElementById('password')
+    pass2 = document.getElementById('passwordAgain')
+    reqs = document.getElementById('requirements')
+
+    pass1.addEventListener('focus', function () {
+        reqs.setAttribute('open', '')
+    })
+    pass1.addEventListener('blur', function () {
+        reqs.removeAttribute('open')
+    })
+    pass2.addEventListener('focus', function () {
+        reqs.setAttribute('open', '')
+    })
+    pass2.addEventListener('blur', function () {
+        reqs.removeAttribute('open')
+    })
+
+    pass1.addEventListener('input', passwordTooltips)
+    pass2.addEventListener('input', passwordTooltips)
+
+
+    // прослушиватель поля секретного слова
+    secret = document.getElementById('secret')
+    secret.addEventListener('focus', function () {
+        reqs.setAttribute('open', '')
+    })
+    secret.addEventListener('blur', function () {
+        reqs.removeAttribute('open')
+    })
+    secret.addEventListener('input', secretTooltips)
+
+}
+
+async function changeClass(obj, bef, aft) {
+    obj.classList.remove(bef)
+    obj.classList.add(aft)
+}
+
+async function logTooltips(event) {
+    console.log('catched login')
+    el_login = event.currentTarget
+    el_value = el_login.value
+    tooltip_val = document.getElementById('logVals')
+    console.log(el_value.match(/[0-9a-zA-Z!@#$%&*_.-]+/))
+    if (el_value.trim() !== '') {
+        if (el_value.match(/[0-9a-zA-Z!@#$%&*_.-]+/)) {
+            console.log('matched')
+            changeClass(tooltip_val, 'invalid', 'valid')
+        } else {
+            console.log('not matched')
+            changeClass(tooltip_val, 'valid', 'invalid')
+        }
+    } else {
+        changeClass(tooltip_val, 'invalid', 'valid')
+    }
+    tooltip_length = document.getElementById('logLength')
+    if (el_value.length >= 3) {
+        changeClass(tooltip_length, 'invalid', 'valid')
+    } else {
+        changeClass(tooltip_length, 'valid', 'invalid')
+    }
+}
+
+async function passwordTooltips(event) {
+    pass_1 = document.getElementById('password')
+    pass_2 = document.getElementById('passwordAgain')
+
+    pass1_value = pass1.value
+    pass2_value = pass2.value
+
+    pass_same = document.getElementById('passSame')
+    if (pass1_value === pass2_value) {
+        changeClass(pass_same, 'invalid', 'valid')
+    } else {
+        changeClass(pass_same, 'valid', 'invalid')
+    }
+
+    pass_length = document.getElementById('passLength')
+
+    if (pass_same.classList.contains('valid')) {
+        if (pass1_value.length >= 8) {
+            changeClass(pass_length, 'invalid', 'valid')
+        } else {
+            changeClass(pass_length, 'valid', 'invalid')
+        }
+
+        passVals = document.getElementById('passVals')
+        if (pass1_value.match(/^[0-9a-zA-Z!@#$%&*_.-]+$/)) {
+            changeClass(passVals, 'invalid', 'valid')
+        } else {
+            changeClass(passVals, 'valid', 'invalid')
+        }
+
+        passReqs = document.getElementById('passReqs')
+        if (pass1_value.match(/(?=.*[a-zA-Z])(?=.*[0-9])/)) {
+            changeClass(passReqs, 'invalid', 'valid')
+        } else {
+            changeClass(passReqs, 'valid', 'invalid')
+        }
+    }
+}
+
+async function secretTooltips(event) {
+    secret = document.getElementById('secret')
+    secret_value = secret.value
+
+    secretVals = document.getElementById('secretVals')
+    if (secret_value !== '') {
+        if (secret_value.match(/^[a-zA-Zа-яА-Я0-9!@#$%&*_.-]+$/)) {
+            changeClass(secretVals, 'invalid', 'valid')
+        } else {
+            changeClass(secretVals, 'valid', 'invalid')
+        }
+    } else {
+        changeClass(secretVals, 'invalid', 'valid')
+    }
+}

@@ -23,15 +23,31 @@
 
     <div class="row">
         <div class="row">
-            <div class="col-9">
+            <details id="requirements" class="col-md-3" style="margin-left: 50px">
+                <summary>Требования к вводу данных</summary>
+                <ul>
+                    <li id="logVals" class="valid">В логине допустимы латинские буквы любого регистра, цифры, а также специальные символы: !@#$%&*_.-</li>
+                    <li id="logLength" class="invalid">Логин должен быть длиной не менее 3 символов</li>
+                    <li id="passSame" class="valid">Пароли должны совпадать друг с другом</li>
+                    <li id="passLength" class="invalid">Пароль должен быть длиной не менее 8 символов</li>
+                    <li id="passVals" class="valid">В пароле разрешаются латинские буквы любого регистра, цифры, а также специальные символы: !@#$%&*_.-</li>
+                    <li id="passReqs" class="invalid">Пароль обязательно должен в себе содержать латинские буквы любого регистра, а также должен содержать цифры</li>
+                    <li id="secretVals" class="valid">В секретном слове разрешаются латинские и русские буквы любого регистра, цифры а также специальные символы:
+                        !@#$%&*_.-
+                    </li>
+                    <li class="valid">Ограничений на длину секретного слова нет</li>
+                </ul>
+            </details>
+            <div class="col-5">
                 <form id="RegisterForm">
                     <div class="row justify-content-center">
                         <div class="col-md-6 text-center">
                             <div class="form-group row">
                                 <label for="username" class="col-md-4 col-form-label text-end">Логин:</label>
                                 <div class="col-md-8">
-                                    <input type="text" class="form-control" id="username" name="username" onblur="checkLogin('username')"
+                                    <input type="text" class="form-control" id="username" name="username"
                                            required>
+
                                 </div>
                             </div>
                         </div>
@@ -47,7 +63,7 @@
                                     <div class="show-password">
                                         <input id="tg1" type="checkbox" onclick="toggdlePassword('password')" tabindex="-1">
                                         <label for="tg1" style="margin-left: 5px">Показать пароль</label>
-                                        
+
                                     </div>
                                 </div>
                             </div>
@@ -88,9 +104,8 @@
                 </form>
             </div>
 
-            <div id="passData" class="col" style="display: none">
+            <div id="passData" class="col" style="display: none; background-color: azure">
                 <span id="passwordData">
-
                 </span>
             </div>
         </div>
@@ -100,6 +115,7 @@
 
 </div>
 <script src="static/js/main.js"></script>
-<script>createAccount()</script>
-<script>checkPasswords('password', 'passwordAgain')</script>
+<!--<script>createAccount()</script>-->
+<script>addEventListenersInputs()</script>
+<!--<script>checkPasswords('password', 'passwordAgain')</script>-->
 </body>

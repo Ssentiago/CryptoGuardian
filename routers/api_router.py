@@ -18,6 +18,7 @@ async def password_strength(password: Optional[str]):
         print(pwned)
         print(score)
         return createResponce(JSONResponse, status.HTTP_200_OK, {'password': password, 'score': score, 'pwned': pwned})
+    return createResponce(Response, status.HTTP_404_NOT_FOUND)
 
 
 @router.post('/api/validate')

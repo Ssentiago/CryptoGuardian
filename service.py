@@ -76,6 +76,7 @@ async def get_pwned(password):
             if tail == line:
                 pwned += int(count)
         return f"Пароль был скомпроментирован {pwned} раз"
+    return 'Не удалось получить данные'
 
 
 env: Env = Env()
