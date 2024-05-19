@@ -1,15 +1,15 @@
 import logging
 
-from fastapi import APIRouter, Body, Header, HTTPException
+from fastapi import APIRouter, Body, HTTPException
 from starlette import status
 from starlette.requests import Request
-from starlette.responses import JSONResponse, Response, RedirectResponse
+from starlette.responses import JSONResponse, RedirectResponse, Response
 from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 
-from database.database import change_password, check_enter, check_exists_user, check_token, delete_token, forgot_password, get_user_name, \
+from database.database import change_password, check_enter, check_token, delete_token, forgot_password, get_user_name, \
     make_new_user
-from service import createResponce, regex_login, regex_password
+from service import createResponce
 
 router = APIRouter()
 router.mount("/static", StaticFiles(directory = "./static"), name = "static")
@@ -69,7 +69,7 @@ async def get_change_password(request: Request):
     token = request.cookies.get('token')
     if token:
         return templates.TemplateResponse('auth/auth_change_password.html', {"request": request})
-    return RedirectResponse(url='/accessDenied')
+    return RedirectResponse(url = '/accessDenied')
 
 
 @router.post('/change_password')
@@ -94,8 +94,6 @@ async def post_forgot(data: dict = Body(...)):
     if token:
         return createResponce(Response, status.HTTP_200_OK, cookies = {'token': token})
     raise HTTPException(status_code = status.HTTP_401_UNAUTHORIZED)
-
-
 
 
 @router.get('/accessDenied')

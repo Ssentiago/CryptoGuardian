@@ -49,13 +49,13 @@ def get_user_name(token: str):
 
 def make_new_user(login, password, secret):
     if regex_login(login) and regex_password(password) and regex_secret(secret):
-        with SessionLocal() as session:
-            user = User(login = login, password = password, secret = secret)
-            session.add(user)
-            session.commit()
-            return True
-    else:
-        return False
+        if check_exists_user(login):
+            with SessionLocal() as session:
+                user = User(login = login, password = password, secret = secret)
+                session.add(user)
+                session.commit()
+                return True
+    return False
 
 
 def forgot_password(login, secret):

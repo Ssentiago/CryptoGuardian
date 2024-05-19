@@ -35,30 +35,38 @@ function createAccount() {
     const loginForm = document.getElementById('RegisterForm');
     loginForm.addEventListener('submit', async (event) => {
         event.preventDefault();
+
         const user = document.getElementById('username').value
         const password = document.getElementById('password').value
         const secret = document.getElementById('secret').value
 
-        const response = await fetch(window.location.href, {
-            method: 'POST',
-            headers: {"Accept": "application/json", "Content-Type": "application/json", "Action": "Register"},
-            body: JSON.stringify({
-                'user': user,
-                'password': password,
-                'secret': secret
-            })
-        });
+
+        if (await checkRequirements() === true) {
+
+            const response = await fetch(window.location.href, {
+                method: 'POST',
+                headers: {"Accept": "application/json", "Content-Type": "application/json", "Action": "Register"},
+                body: JSON.stringify({
+                    'user': user,
+                    'password': password,
+                    'secret': secret
+                })
+            });
 
 
-        if (response.status === 200) {
-            displayToast('Аккаунт успешно создан', 'Сейчас вы будете перенаправлены на главную страницу')
+            if (response.status === 200) {
+                displayToast('Аккаунт успешно создан', 'Сейчас вы будете перенаправлены на главную страницу')
 
-            setTimeout(function () {
-                window.location.href = '/'
+                setTimeout(function () {
+                    window.location.href = '/'
 
-            }, 5000)
+                }, 3000)
+            } else {
+                displayToast('Что-то пошло не так...', 'Произошла ошибка при обработке введенных данных. Пожалуйста, проверьте их и попробуйте еще раз.', 'error')
+            }
+
         } else {
-            displayToast('Что-то пошло не так...', 'Возможно, пользователь уже существует или ваш ввод содержит запрещённые символы', 'error')
+            displayToast('Проверьте ввод', 'Ввши данные соответствуют не всем требованиям', 'warning')
         }
 
 
@@ -366,30 +374,6 @@ function toggdlePassword(id) {
     }
 };
 
-// async function checkLogin(log_id) {
-//     let user = document.getElementById(log_id).value
-//     if (user) {
-//         console.log(user)
-//         const response = await fetch('/validate', {
-//             method: 'POST',
-//             headers: {"Accept": "application/json", "Content-Type": "application/json", "Action": "CheckLogin"},
-//             body: JSON.stringify({
-//                 'obj': user,
-//             })
-//         })
-//         el = document.getElementById('checklogin')
-//         if (response.status !== 200) {
-//             responceData = await response.json();
-//             msg = responceData.message
-//             displayToast('Ошибка', msg, 'error')
-//         } else {
-//             el.textContent = ''
-//         }
-//     }
-//
-// };
-
-
 async function exportData() {
     const responce = await fetch('/export', {
         method: 'GET',
@@ -441,30 +425,26 @@ function generateTable(data) {
 };
 
 
-async function fetchPasswordValidation(password) {
-    const response = await fetch('/api/validate', {
-        method: 'POST',
-        headers: {"Accept": "application/json", "Content-Type": "application/json", "Action": "CheckPassword"},
-        body: JSON.stringify({
-            'obj': password
-        })
-    })
-
-    if (response.status === 200) {
-        return true
-    } else {
-        return false
-    }
-};
-
 async function fetchPasswordStrengthAndPwns(password) {
+    console.log('fetching...')
+    el = document.getElementById('passwordData')
+    container = document.getElementById('passData')
+    container.style.display = 'inline'
+    el.innerHTML = 'Проверяем силу пароля и был ли он слит...'
+
+
     const response = await fetch('/api/passwordStrength/' + password, {
         method: 'GET',
         body: null
     })
     if (response.status === 200) {
         responseData = await response.json();
-        return responseData
+        setTimeout(async function () {
+            output = 'Оценка пароля: ' + responseData.score + '<br>' + 'pwned: ' + responseData.pwned
+            el.innerHTML = output
+        }, 3000)
+
+
     } else {
         return false
     }
@@ -472,87 +452,23 @@ async function fetchPasswordStrengthAndPwns(password) {
 };
 
 
-async function passwordEventsCatcher(event) {
-    pass1_el = document.getElementById('password')
-    pass2_el = document.getElementById('passwordAgain')
-    pass1 = pass1_el.value.trim()
-    pass2 = pass2_el.value.trim()
+async function addEventListenersForInputs() {
+    //  прослушиваем событие наведения мыши на контейнер с формой RegisterForm
+    form = document.getElementById('RegisterForm')
+    req = document.getElementById('requirements')
+    form.addEventListener('mouseover', function (event) {
+        req.setAttribute('open', '')
+    })
+    form.addEventListener('mouseout', function (event) {
+        req.removeAttribute('open')
+    })
 
-    if (pass1 !== '' || pass2 !== '') {
-        if (pass1 === pass2) {
-            password = pass1
-
-            validationCheck = await fetchPasswordValidation(password)
-            if (validationCheck) {
-                el = document.getElementById('passwordData')
-                container = document.getElementById('passData')
-                container.style.display = 'inline'
-                el.innerHTML = 'Проверяем силу пароля и был ли он слит...'
-                let passwordData = await fetchPasswordStrengthAndPwns(password)
-
-                if (passwordData !== false) {
-                    setTimeout(async function () {
-                        output = 'Оценка пароля: ' + passwordData.score + '<br>' + 'pwned: ' + passwordData.pwned
-                        el.innerHTML = output
-                    }, 3000)
-
-
-                }
-
-            } else {
-                console.log('waiting for good passws...')
-            }
-
-
-        } else {
-            console.log('waiting for same inputs...')
-        }
-
-    } else {
-        console.log('waiting for inputs...')
-    }
-
-
-}
-
-async function checkPasswords(pass1_id, pass2_id) {
-    console.log('started...')
-    password1 = document.getElementById(pass1_id)
-    password2 = document.getElementById(pass2_id)
-
-    password1.addEventListener('blur', passwordEventsCatcher)
-    password2.addEventListener('blur', passwordEventsCatcher)
-};
-
-async function addEventListenersInputs() {
     // прослушиватели поля логина
     log_inp = document.getElementById('username')
-    log_inp.addEventListener('focus', function () {
-        el = document.getElementById('requirements')
-        el.setAttribute('open', '')
-    })
-    log_inp.addEventListener('blur', function () {
-        el = document.getElementById('requirements')
-        el.removeAttribute('open')
-    })
     log_inp.addEventListener('input', logTooltips)
     // прослушиватели полей пароля
     pass1 = document.getElementById('password')
     pass2 = document.getElementById('passwordAgain')
-    reqs = document.getElementById('requirements')
-
-    pass1.addEventListener('focus', function () {
-        reqs.setAttribute('open', '')
-    })
-    pass1.addEventListener('blur', function () {
-        reqs.removeAttribute('open')
-    })
-    pass2.addEventListener('focus', function () {
-        reqs.setAttribute('open', '')
-    })
-    pass2.addEventListener('blur', function () {
-        reqs.removeAttribute('open')
-    })
 
     pass1.addEventListener('input', passwordTooltips)
     pass2.addEventListener('input', passwordTooltips)
@@ -560,15 +476,12 @@ async function addEventListenersInputs() {
 
     // прослушиватель поля секретного слова
     secret = document.getElementById('secret')
-    secret.addEventListener('focus', function () {
-        reqs.setAttribute('open', '')
-    })
-    secret.addEventListener('blur', function () {
-        reqs.removeAttribute('open')
-    })
+
     secret.addEventListener('input', secretTooltips)
 
+
 }
+
 
 async function changeClass(obj, bef, aft) {
     obj.classList.remove(bef)
@@ -598,6 +511,8 @@ async function logTooltips(event) {
     } else {
         changeClass(tooltip_length, 'valid', 'invalid')
     }
+
+
 }
 
 async function passwordTooltips(event) {
@@ -636,6 +551,12 @@ async function passwordTooltips(event) {
         } else {
             changeClass(passReqs, 'valid', 'invalid')
         }
+
+        passReqs = document.getElementById('requirements').querySelectorAll('[id^="pass"]')
+        if (await checkValidPassReqs(passReqs) === true) {
+            await fetchPasswordStrengthAndPwns(pass1_value)
+        }
+
     }
 }
 
@@ -654,3 +575,29 @@ async function secretTooltips(event) {
         changeClass(secretVals, 'invalid', 'valid')
     }
 }
+
+async function checkRequirements() {
+    reqs = document.getElementById('requirements')
+    req_lis = reqs.querySelectorAll('li')
+
+
+    for (i = 0; i < req_lis.length; i++) {
+        if (req_lis[i].classList.contains('invalid')) {
+            return false
+        }
+    }
+    return true
+}
+
+async function checkValidPassReqs(req) {
+
+    for (let i = 0; i < req.length; i++) {
+        if (req[i].classList.contains('invalid')) {
+            return false
+        }
+    }
+    return true
+}
+
+// TODO: reformat this file. Delete old functions like changePasswords etc...
+// TODO: add event listener to requirements container for change an child's class where id starts with 'pass'
