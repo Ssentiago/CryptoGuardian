@@ -396,7 +396,7 @@ async function exportData() {
     } else if (responce.status === 404) {
         displayToast('У вас пока нет данных для скачивания', '', 'info')
     } else {
-        console.log('Произошла ошибка', responce.status)
+        
         displayToast('Во время скачивания файла произошла ошибка', 'Если подобное повторится, обратитесь к администратору сайта', 'error')
     }
 
@@ -426,7 +426,7 @@ function generateTable(data) {
 
 
 async function fetchPasswordStrengthAndPwns(password) {
-    console.log('fetching...')
+    
     el = document.getElementById('passwordData')
     container = document.getElementById('passData')
     container.style.display = 'inline'
@@ -489,17 +489,17 @@ async function changeClass(obj, bef, aft) {
 }
 
 async function logTooltips(event) {
-    console.log('catched login')
+    
     el_login = event.currentTarget
     el_value = el_login.value
     tooltip_val = document.getElementById('logVals')
-    console.log(el_value.match(/[0-9a-zA-Z!@#$%&*_.-]+/))
+    )
     if (el_value.trim() !== '') {
-        if (el_value.match(/[0-9a-zA-Z!@#$%&*_.-]+/)) {
-            console.log('matched')
+        if (el_value.match(/^[0-9a-zA-Z!@#$%&*_.-]+$/)) {
+            
             changeClass(tooltip_val, 'invalid', 'valid')
         } else {
-            console.log('not matched')
+            
             changeClass(tooltip_val, 'valid', 'invalid')
         }
     } else {
