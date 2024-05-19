@@ -1,20 +1,36 @@
+import asyncio
 import csv
 import hashlib
 import io
 import random
 import re
 import string
-from typing import Optional
+from typing import Any, Optional
 
+import aiohttp
+import requests
+import zxcvbn
 from cryptography.fernet import Fernet
 from environs import Env
 from starlette.responses import JSONResponse, Response
 
+from logs.log import *
 
-async def generate_password(length: int,
-                            includeLows: bool,
-                            includeUps: bool,
-                            include_digs: bool, include_spec: bool) -> str:
+logger = logging.getLogger(__name__)
+
+
+def db_hash(data):
+    return hashlib.sha256(data.encode()).hexdigest()
+
+
+def sha1_hash(data):
+    return hashlib.sha1(data.encode()).hexdigest()
+
+
+def generate_password(length: int,
+                      includeLows: bool,
+                      includeUps: bool,
+                      include_digs: bool, include_spec: bool) -> str:
     alphabet = ''
     if includeLows:
         alphabet += string.ascii_lowercase
@@ -25,6 +41,41 @@ async def generate_password(length: int,
     if include_spec:
         alphabet += '!@#$%&*_.-'
     return ''.join(random.choice(alphabet) for _ in range(length))
+
+
+def get_pass_score(password: str) -> list[int, int]:
+    pass_data = zxcvbn.zxcvbn(password)
+    score = pass_data['score']
+    match score:
+        case 0:
+            return 'Очень слабый пароль'
+        case 1:
+            return 'Слабый пароль'
+        case 2:
+            return 'Нормальный пароль'
+        case 3:
+            return 'Хороший пароль'
+        case 4:
+            return 'Отличный пароль'
+
+
+
+
+
+async def get_pwned(password):
+    hash = sha1_hash(password)
+    head = hash[:5].upper()
+    tail = hash[5:].upper()
+    pwned = 0
+    url = fr'https://api.pwnedpasswords.com/range/{head}'
+
+    req = requests.get(url)
+    if req.status_code == 200:
+        for line in req.text.splitlines():
+            line, count = line.strip().split(':')
+            if tail == line:
+                pwned += int(count)
+        return f"Пароль был скомпроментирован {pwned} раз"
 
 
 env: Env = Env()
@@ -42,10 +93,6 @@ def regex_password(password):
 
 def regex_secret(secret):
     return bool(re.fullmatch(r'[0-9a-zA-Zа-яА-Я!@#$%&*_.-]+', secret))
-
-
-def db_hash(data):
-    return hashlib.sha256(data.encode()).hexdigest()
 
 
 def createResponce(init: JSONResponse | Response, status_code, data: Optional[dict] = None,

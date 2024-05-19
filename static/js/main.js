@@ -32,7 +32,7 @@ function authenticateUser() {
 };
 
 function createAccount() {
-    const loginForm = document.getElementById('loginForm');
+    const loginForm = document.getElementById('RegisterForm');
     loginForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         const user = document.getElementById('username').value
@@ -164,6 +164,8 @@ function logout() {
 
 async function generatePassword() {
     const generateOutput = document.getElementById('generatedPassword');
+    const scoreOutput = document.getElementById('score');
+    const pwnedOutput = document.getElementById('pwned');
     const p_length_field = document.getElementById('passwordLength')
 
     if (parseInt(p_length_field.value) > parseInt(p_length_field.max)) {
@@ -195,6 +197,8 @@ async function generatePassword() {
         const responseData = await response.json();
         const password = await responseData.password
         generateOutput.textContent = password;
+
+
     }
 
 
@@ -385,26 +389,6 @@ async function checkLogin(log_id) {
 
 };
 
-async function checkPassword(pass_id) {
-    const pass = document.getElementById(pass_id)
-    const password = pass.value
-    if (password) {
-        const response = await fetch('/validate', {
-            method: 'POST',
-            headers: {"Accept": "application/json", "Content-Type": "application/json", "Action": "CheckPassword"},
-            body: JSON.stringify({
-                'obj': password
-            })
-        })
-
-        if (response.status !== 200) {
-            displayToast('Ошибка!', 'Пароль некорректен!', 'error')
-        } else {
-            el.textContent = ''
-        }
-    }
-
-};
 
 async function exportData() {
     const responce = await fetch('/export', {
@@ -454,5 +438,87 @@ function generateTable(data) {
     })
     table += '</tbody></table>'
     return table
+};
+
+
+async function fetchPasswordValidation(password) {
+    const response = await fetch('/api/validate', {
+        method: 'POST',
+        headers: {"Accept": "application/json", "Content-Type": "application/json", "Action": "CheckPassword"},
+        body: JSON.stringify({
+            'obj': password
+        })
+    })
+
+    if (response.status === 200) {
+        return true
+    } else {
+        return false
+    }
+};
+
+async function fetchPasswordStrengthAndPwns(password) {
+    const response = await fetch('/api/passwordStrength/' + password, {
+        method: 'GET',
+        body: null
+    })
+    if (response.status === 200) {
+        responseData = await response.json();
+        return responseData
+    } else {
+        return false
+    }
+
+};
+
+
+async function passwordEventsCatcher(event) {
+    pass1_el = document.getElementById('password')
+    pass2_el = document.getElementById('passwordAgain')
+    pass1 = pass1_el.value.trim()
+    pass2 = pass2_el.value.trim()
+
+    if (pass1 !== '' || pass2 !== '') {
+        if (pass1 === pass2) {
+            password = pass1
+
+            validationCheck = await fetchPasswordValidation(password)
+            if (validationCheck) {
+
+                let passwordData = await fetchPasswordStrengthAndPwns(password)
+
+                if (passwordData !== false) {
+                    el = document.getElementById('passwordData')
+                    container = document.getElementById('passData')
+                    container.style.display = 'inline'
+                    output = 'Оценка пароля: ' + passwordData.score + '<br>' + 'pwned: ' +  passwordData.pwned
+                    el.innerHTML = output
+
+
+                }
+
+            } else {
+                console.log('waiting for good passws...')
+            }
+
+
+        } else {
+            console.log('waiting for same inputs...')
+        }
+
+    } else {
+        console.log('waiting for inputs...')
+    }
+
+
+}
+
+async function checkPasswords(pass1_id, pass2_id) {
+    console.log('started...')
+    password1 = document.getElementById(pass1_id)
+    password2 = document.getElementById(pass2_id)
+
+    password1.addEventListener('blur', passwordEventsCatcher)
+    password2.addEventListener('blur', passwordEventsCatcher)
 };
 

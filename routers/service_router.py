@@ -10,7 +10,7 @@ from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 
 from database.database import add_new_data, check_token, del_all_data, delete_data, get_all_data, get_user_name
-from service import generate_csv, generate_password, createResponce
+from service import generate_csv, generate_password, createResponce, get_pass_score
 
 router = APIRouter()
 router.mount("/static", StaticFiles(directory = "./static"), name = "static")
@@ -38,7 +38,7 @@ async def post_main(data: Optional[dict] = Body(None), action: str = Header(None
             include_ups = data['include_ups']
             include_digs = data['include_digs']
             include_spec = data['include_spec']
-            generated_password = await generate_password(password_length,
+            generated_password = generate_password(password_length,
                                                          include_lows,
                                                          include_ups,
                                                          include_digs,
@@ -84,3 +84,4 @@ async def get_download(token: Optional[str] = Cookie(None)):
             return response
         raise HTTPException(status_code = status.HTTP_404_NOT_FOUND)
     return RedirectResponse(url = '/accessDenied')
+

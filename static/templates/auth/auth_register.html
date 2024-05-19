@@ -12,59 +12,94 @@
 
 <body>
 
-<div class="container">
+<div style="padding: 20px" class="container">
     <div class="row">
-        <div class="col-12 text-center">
+        <div class="col-md-10 text-center">
             <h3>Создайте свой аккаунт здесь</h3>
         </div>
     </div>
 </div>
 <div>
 
+    <div class="row">
+        <div class="row">
+            <div class="col-9">
+                <form id="RegisterForm">
+                    <div class="row justify-content-center">
+                        <div class="col-md-6 text-center">
+                            <div class="form-group row">
+                                <label for="username" class="col-md-4 col-form-label text-end">Логин:</label>
+                                <div class="col-md-8">
+                                    <input type="text" class="form-control" id="username" name="username" onblur="checkLogin('username')"
+                                           required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-    <form id="loginForm" class="container mt-3">
-        <h5>Введите логин и пароль</h5>
-        <details>
-            <summary>Требования к вводу данных</summary>
-            <ul>
-                <li>В логине разрешаются латинские буквы любого регистра, цифры, а также специальные символы: !@#$%&*_.-</li>
-                <li>Логин должен быть длиной не менее 3 символов</li>
-                <li>Пароль обязательно должен в себе содержать латинские буквы любого регистра, а также должен содержать цифры</li>
-                <li>В пароле разрешаются латинские буквы любого регистра, цифры, а также специальные символы: !@#$%&*_.-</li>
-                <li>Пароль должен быть длиной не менее 8 символов</li>
-                <li>В секретном слове разрешаются латинские и русские буквы любого регистра, цифры а также специальные символы: !@#$%&*_.-
-                </li>
-                <li>Ограничений на длину секретного слова нет</li>
-            </ul>
-        </details>
 
+                    <div class="row justify-content-center">
+                        <div class="col-md-6 text-center">
+                            <div class="form-group row">
+                                <label for="password" class="col-md-4 col-form-label text-end">Пароль:</label>
+                                <div class="col-md-8">
+                                    <input type="password" class="form-control" id="password" name="password" required>
+                                    <div class="show-password">
+                                        <input id="tg1" type="checkbox" onclick="toggdlePassword('password')" tabindex="-1">
+                                        <label for="tg1" style="margin-left: 5px">Показать пароль</label>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <label for="username" class="form-label">Логин:</label>
-                <input type="text" class="form-control" id="username" name="username" onblur="checkLogin('username')" required>
+                    </div>
+                    <div class="row justify-content-center">
+                        <div class="col-md-6 text-center">
+                            <div class="form-group row">
+                                <label for="passwordAgain" class="col-md-4 col-form-label text-end">Введите пароль снова:</label>
+                                <div class="col-md-8">
+                                    <input type="password" class="form-control" id="passwordAgain" name="passwordAgain" required>
+                                    <div class="show-password">
+                                        <input id="tg2" type="checkbox" onclick="toggdlePassword('passwordAgain')" tabindex="-1">
+                                        <label for="tg2" style="margin-left: 5px">Показать пароль</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row justify-content-center">
+                        <div class="col-md-6 text-center">
+                            <div class="form-group row">
+                                <label for="secret" class="col-md-4 col-form-label text-end">Секретное слово:</label>
+                                <div class="col-md-8">
+                                    <input class="form-control" id="secret" name="secret" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row justify-content-center">
+                        <div class="col-md-6 text-center">
+                            <button type="submit" class="btn btn-primary btn-lg">Создать аккаунт</button>
+                        </div>
+                    </div>
+
+                </form>
             </div>
-            <div class="col-md-6">
-                <label for="password" class="form-label">Пароль:</label>
-                <input type="password" class="form-control" id="password" name="password" onblur="checkPassword('password')" required>
-                <label>
-                    <input type="checkbox" onclick="toggdlePassword('password')"> Показать пароль
-                </label><br>
 
-            </div>
-            <div class="col-md-6">
-                <label for="secret" class="form-label">Секретное слово. Запомните его: утеряв секретное слово, вы не сможете восстановить
-                    свой аккаунт, если забудете пароль:</label>
-                <input class="form-control" id="secret" name="secret" required>
+            <div id="passData" class="col" style="display: none">
+                <span id="passwordData">
+
+                </span>
             </div>
         </div>
-        <div class="d-grid gap-2">
-            <button type="submit" class="btn btn-primary btn-lg">Создать аккаунт</button>
-        </div>
-    </form>
+
+    </div>
 
 
 </div>
 <script src="static/js/main.js"></script>
 <script>createAccount()</script>
+<script>checkPasswords('password', 'passwordAgain')</script>
 </body>

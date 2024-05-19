@@ -96,23 +96,7 @@ async def post_forgot(data: dict = Body(...)):
     raise HTTPException(status_code = status.HTTP_401_UNAUTHORIZED)
 
 
-@router.post('/validate')
-async def post_validate(action: str = Header(...), data: dict = Body(None)):
-    match action:
-        case 'CheckPassword':
-            if regex_password(data['obj']):
-                return createResponce(Response, status.HTTP_200_OK)
-            raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST)
-        case 'CheckLogin':
-            login = data['obj']
-            if check_exists_user(login):
-                if regex_login(login):
-                    return createResponce(Response, status.HTTP_200_OK)
-                else:
-                    return createResponce(JSONResponse, status.HTTP_401_UNAUTHORIZED, {'message': 'Неправильное имя пользователя!'})
-            else:
-                return createResponce(JSONResponse, status.HTTP_401_UNAUTHORIZED,
-                                      {'message': 'Пользователь с таким именем уже существует!'})
+
 
 @router.get('/accessDenied')
 async def get_access_deiden(request: Request):

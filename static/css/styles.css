@@ -48,7 +48,7 @@ body {
 
 table {
     width: 650px;
-    border-top: 7px solid rgb(43, 129, 17);
+    border-top: 7px solid #dddddd;
     border-collapse: collapse;
     text-align: center;
     margin-bottom: 20px;
@@ -58,12 +58,85 @@ table {
 td {
     text-align: left;
     padding: 10px;
-    border: 3px solid rgb(43, 129, 17);
+    border: 1px solid #dddddd;
 }
 
 th {
     text-align: center;
     padding: 10px;
-    border: 3px solid rgb(43, 129, 17);
+    border: 1px solid #dddddd;
 }
 
+/* Стиль всех полей ввода */
+input {
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-top: 6px;
+    margin-bottom: 16px;
+}
+
+
+/* Окно сообщения отображается, когда пользователь нажимает на поле пароля */
+#message {
+    display: none;
+    background: #f1f1f1;
+    color: #000;
+    position: relative;
+    padding: 20px;
+    margin-top: 10px;
+}
+
+#message p {
+    padding: 10px 35px;
+    font-size: 18px;
+}
+
+/* Добавить зеленый цвет текста и галочка, когда требования верны */
+.valid {
+    color: green;
+}
+
+.valid:before {
+    position: relative;
+    left: -35px;
+    content: "&#10004;";
+}
+
+/* Добавить красный цвет текста и собой "x" и значок, когда требования не правы */
+.invalid {
+    color: red;
+}
+
+.invalid:before {
+    position: relative;
+    left: -35px;
+    content: "&#10006;";
+}
+
+.show-password {
+    display: flex;
+    align-items: flex-start;
+}
+
+label {
+    user-select: none;
+}
+
+#passData {
+    display: block;
+    width: 200px; /* Уменьшенный размер */
+    height: 100px;
+    margin: 5px 0; /* Уменьшенный отступ */
+    padding: 5px; /* Уменьшенный padding */
+    border: 1px solid #ccc;
+    background-color: #f2f2f2; /* Светлый фон */
+    font-family: Arial, sans-serif;
+    font-size: 16px; /* Увеличенный размер шрифта */
+    color: #333;
+    text-align: left;
+    line-height: 1.6; /* Увеличенное межстрочное расстояние */
+    border-radius: 10px; /* Более округленные углы */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
