@@ -396,7 +396,7 @@ async function exportData() {
     } else if (responce.status === 404) {
         displayToast('У вас пока нет данных для скачивания', '', 'info')
     } else {
-        
+
         displayToast('Во время скачивания файла произошла ошибка', 'Если подобное повторится, обратитесь к администратору сайта', 'error')
     }
 
@@ -426,7 +426,7 @@ function generateTable(data) {
 
 
 async function fetchPasswordStrengthAndPwns(password) {
-    
+
     el = document.getElementById('passwordData')
     container = document.getElementById('passData')
     container.style.display = 'inline'
@@ -489,17 +489,17 @@ async function changeClass(obj, bef, aft) {
 }
 
 async function logTooltips(event) {
-    
+
     el_login = event.currentTarget
     el_value = el_login.value
     tooltip_val = document.getElementById('logVals')
-    )
+
     if (el_value.trim() !== '') {
         if (el_value.match(/^[0-9a-zA-Z!@#$%&*_.-]+$/)) {
-            
+
             changeClass(tooltip_val, 'invalid', 'valid')
         } else {
-            
+
             changeClass(tooltip_val, 'valid', 'invalid')
         }
     } else {
