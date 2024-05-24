@@ -39,10 +39,6 @@ class UserValidation(UserBase):
     secret: str
 
 
-class UserChangePassword(UserBase):
-    password: str
-
-
 class UserSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: int

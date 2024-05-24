@@ -99,7 +99,7 @@ async function validateUserForPasswordReset() {
             displayToast('Валидация прошла успешно', 'Сейчас вы будете перенаправлены на страницу смены пароля')
             setTimeout(function () {
 
-                window.location.href = '/change_password'
+                window.location.href = '/auth/change_password'
             }, 2000)
 
         } else {
@@ -111,12 +111,12 @@ async function validateUserForPasswordReset() {
 };
 
 
-function changePassword() {
+async function changePassword() {
 
     const form = document.getElementById('ChangeForm');
 
     form.addEventListener('submit', async (event) => {
-        event.preventDefault(); // Предотвращаем стандартное поведение формы
+        event.preventDefault();
 
         const password1 = document.getElementById('pass1').value;
         const password2 = document.getElementById('pass2').value;
@@ -128,7 +128,7 @@ function changePassword() {
 
             const response = await fetch('/user/change_password', {
                 method: 'POST',
-                headers: {"Accept": "application/json", "Content-Type": "application/json", },
+                headers: {"Accept": "application/json", "Content-Type": "application/json",},
                 body: JSON.stringify({
                     'password': password1
                 })
@@ -137,7 +137,7 @@ function changePassword() {
             if (response.status === 200) {
                 displayToast('Смена пароля произошла успешно', 'Сейчас вы будете перенаправлены на главную страницу')
                 setTimeout(function () {
-                    window.location.href = '/main';
+                    window.location.href = '/main/';
                 }, 2000)
 
             } else {
@@ -148,21 +148,20 @@ function changePassword() {
 
 };
 
-function logout() {
+async function logout() {
     displayToast('До встречи!', '', '')
-    setTimeout(async function () {
 
-        const response = await fetch('/token', {
-            method: 'POST',
-            headers: {"Accept": "application/json", "Content-Type": "application/json"},
-            body: JSON.stringify({
-                'deleteRequest': true
-            })
-        });
-        deleteCookie('token')
-        deleteCookie('AuthenticationData')
-        window.location.href = '/'
-    }, 2000);
+    const response = await fetch('/user/logout', {
+        method: 'GET',
+    });
+
+    if (response.status === 200) {
+        setTimeout(async function () {
+
+            window.location.href = '/'
+        }, 2000);
+
+    }
 
 
 };
@@ -191,7 +190,7 @@ async function generatePassword() {
     } else {
         const response = await fetch('/user/service/generatePassword', {
             method: 'POST',
-            headers: {"Accept": "application/json", "Content-Type": "application/json", "Action": "GeneratePassword", },
+            headers: {"Accept": "application/json", "Content-Type": "application/json", "Action": "GeneratePassword",},
             body: JSON.stringify({
                 'length': p_length,
                 'include_lower': includeLows,
@@ -254,7 +253,7 @@ async function addLoginCredentials() {
     if (serviceName && login_ && password) {
         const response = await fetch('/credential/add', {
             method: 'POST',
-            headers: {"Accept": "application/json", "Content-Type": "application/json", "Action": "AddNewData", },
+            headers: {"Accept": "application/json", "Content-Type": "application/json", "Action": "AddNewData",},
             body: JSON.stringify({
                 'service': serviceName,
                 'username': login_,
@@ -290,7 +289,7 @@ async function deleteLoginCredentials() {
     if (serviceName && login_) {
         const response = await fetch('/credential/delete', {
             method: 'POST',
-            headers: {"Accept": "application/json", "Content-Type": "application/json", "Action": "DeleteData", },
+            headers: {"Accept": "application/json", "Content-Type": "application/json", "Action": "DeleteData",},
             body: JSON.stringify({
                 'service': serviceName,
                 'username': login_,

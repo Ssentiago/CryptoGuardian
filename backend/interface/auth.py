@@ -21,30 +21,30 @@ print(os.path.join(settings.static_files_path, "templates"))
 
 @router.get("/login")
 async def login(request: Request):
-    return templates.TemplateResponse("auth/auth_login.html", {"request": request})
+    return templates.TemplateResponse("/auth/auth_login.html", {"request": request})
 
 
 @router.get("/register")
 async def register(request: Request):
-    return templates.TemplateResponse("auth/auth_register.html", {"request": request})
+    return templates.TemplateResponse("/auth/auth_register.html", {"request": request})
 
 
 @router.get("/change_password")
 async def get_change_password(request: Request, user: UserSchema = Depends(access)):
     return templates.TemplateResponse(
-        "auth/auth_change_password.html", {"request": request}
+        "/auth/auth_change_password.html", {"request": request}
     )
 
 
 @router.get("/forgot")
 async def get_forgot(request: Request):
     return templates.TemplateResponse(
-        "auth/auth_reset_password.html", {"request": request}
+        "/auth/auth_reset_password.html", {"request": request}
     )
 
 
 @router.get("/accessDenied")
 async def get_access_denied(request: Request):
     return templates.TemplateResponse(
-        "auth/auth_access_denied.html", {"request": request}
+        "/auth/auth_access_denied.html", {"request": request}
     )

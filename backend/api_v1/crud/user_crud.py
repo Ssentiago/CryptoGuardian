@@ -4,8 +4,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from backend.api_v1.schemas.user_schemas import (
-    UserChangePassword,
     UserCreate,
+    UserSchema,
     UserValidation,
 )
 from backend.core import db_helper, User
@@ -41,12 +41,13 @@ async def forgot_password(user_in: UserValidation, session: AsyncSession):
     return HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
 
-async def change_password(user_in: UserChangePassword, session: AsyncSession):
+async def change_password(
+    user_in: UserSchema, session: AsyncSession, new_password: str
+):
     stat = select(User).where(User.username == user_in.username)
     user_db = await session.execute(stat)
     user: User = user_db.scalar()
     if user:
-        user.password = hash_confidential_data(user_in.password)
-        await session.refresh(user)
+        user.password = hash_confidential_data(new_password)
         await session.commit()
         return True

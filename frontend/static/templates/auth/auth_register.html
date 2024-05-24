@@ -1,120 +1,121 @@
+<!DOCTYPE html>
+<html lang="ru">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Регистрация</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
     <link rel="stylesheet" href="/static/css/styles.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        @media (max-width: 768px) {
+            #main-content {
+                margin-top: 120px; /* Уменьшаем вертикальный отступ для заголовка */
+            }
 
+            #requirements {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                background-color: #f8f9fa;
+                z-index: 1000;
+                padding: 10px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            }
+
+            #requirements summary {
+                font-weight: bold;
+                text-align: center;
+            }
+
+            #requirements ul {
+                display: none;
+            }
+
+            #requirements[open] ul {
+                display: block;
+            }
+
+            #passData {
+                margin-top: 20px;
+            }
+        }
+    </style>
 </head>
-
-
 <body>
 
-<div style="padding: 20px" class="container">
+<div class="container mt-3" id="main-content">
     <div class="row">
-        <div class="col-md-12 text-center">
+        <div class="col-md-10 text-center mx-auto">
             <h3>Создайте свой аккаунт здесь</h3>
         </div>
     </div>
-</div>
-<div>
 
-    <div class="row">
-        <div class="row">
-            <details id="requirements" class="col-md-3" style="margin-left: 50px">
-                <summary>Требования к вводу данных</summary>
-                <ul>
-                    <li id="logVals" class="valid">В логине допустимы латинские буквы любого регистра, цифры, а также специальные символы: !@#$%&*_.-</li>
-                    <li id="logLength" class="invalid">Логин должен быть длиной не менее 3 символов</li>
-                    <li id="passSame" class="valid">Пароли должны совпадать друг с другом</li>
-                    <li id="passLength" class="invalid">Пароль должен быть длиной не менее 8 символов</li>
-                    <li id="passVals" class="valid">В пароле разрешаются латинские буквы любого регистра, цифры, а также специальные символы: !@#$%&*_.-</li>
-                    <li id="passReqs" class="invalid">Пароль обязательно должен в себе содержать латинские буквы любого регистра, а также должен содержать цифры</li>
-                    <li id="secretVals" class="valid">В секретном слове разрешаются латинские и русские буквы любого регистра, цифры а также специальные символы:
-                        !@#$%&*_.-
-                    </li>
-                    <li class="valid">Ограничений на длину секретного слова нет</li>
-                </ul>
-            </details>
-            <div class="col-5">
-                <form id="RegisterForm">
-                    <div class="row justify-content-center">
-                        <div class="col-md-6 text-center">
-                            <div class="form-group row">
-                                <label for="username" class="col-md-4 col-form-label text-end">Логин:</label>
-                                <div class="col-md-8">
-                                    <input type="text" class="form-control" id="username" name="username"
-                                           required>
+    <div class="row mt-3">
+        <details id="requirements" class="col-md-3">
+            <summary>Требования к паролю</summary>
+            <ul>
+                <li id="logVals" class="valid">В логине допустимы латинские буквы любого регистра, цифры, а также специальные символы:
+                    !@#$%&*_.-
+                </li>
+                <li id="logLength" class="invalid">Логин должен быть длиной не менее 3 символов</li>
+                <li id="passSame" class="valid">Пароли должны совпадать друг с другом</li>
+                <li id="passLength" class="invalid">Пароль должен быть длиной не менее 8 символов</li>
+                <li id="passVals" class="valid">В пароле разрешаются латинские буквы любого регистра, цифры, а также специальные символы:
+                    !@#$%&*_.-
+                </li>
+                <li id="passReqs" class="invalid">Пароль обязательно должен в себе содержать латинские буквы любого регистра, а также
+                    должен содержать цифры
+                </li>
+                <li id="secretVals" class="valid">В секретном слове разрешаются латинские и русские буквы любого регистра, цифры а также
+                    специальные символы: !@#$%&*_.-
+                </li>
+                <li class="valid">Ограничений на длину секретного слова нет</li>
+            </ul>
+        </details>
 
-                                </div>
-                            </div>
-                        </div>
+        <div class="col-md-6 mx-auto">
+            <form id="RegisterForm">
+                <div class="mb-3">
+                    <label for="username" class="form-label">Логин:</label>
+                    <input type="text" class="form-control" id="username" name="username" required>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Пароль:</label>
+                    <input type="password" class="form-control" id="password" name="password" required>
+                    <div class="form-check mt-1">
+                        <input id="tg1" class="form-check-input" type="checkbox" onclick="toggdlePassword('password')">
+                        <label for="tg1" class="form-check-label">Показать пароль</label>
                     </div>
-
-
-                    <div class="row justify-content-center">
-                        <div class="col-md-6 text-center">
-                            <div class="form-group row">
-                                <label for="password" class="col-md-4 col-form-label text-end">Пароль:</label>
-                                <div class="col-md-8">
-                                    <input type="password" class="form-control" id="password" name="password" required>
-                                    <div class="show-password">
-                                        <input id="tg1" type="checkbox" onclick="toggdlePassword('password')" tabindex="-1">
-                                        <label for="tg1" style="margin-left: 5px">Показать пароль</label>
-
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
+                </div>
+                <div class="mb-3">
+                    <label for="passwordAgain" class="form-label">Введите пароль снова:</label>
+                    <input type="password" class="form-control" id="passwordAgain" name="passwordAgain" required>
+                    <div class="form-check mt-1">
+                        <input id="tg2" class="form-check-input" type="checkbox" onclick="toggdlePassword('passwordAgain')">
+                        <label for="tg2" class="form-check-label">Показать пароль</label>
                     </div>
-                    <div class="row justify-content-center">
-                        <div class="col-md-6 text-center">
-                            <div class="form-group row">
-                                <label for="passwordAgain" class="col-md-4 col-form-label text-end">Введите пароль снова:</label>
-                                <div class="col-md-8">
-                                    <input type="password" class="form-control" id="passwordAgain" name="passwordAgain" required>
-                                    <div class="show-password">
-                                        <input id="tg2" type="checkbox" onclick="toggdlePassword('passwordAgain')" tabindex="-1">
-                                        <label for="tg2" style="margin-left: 5px">Показать пароль</label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row justify-content-center">
-                        <div class="col-md-6 text-center">
-                            <div class="form-group row">
-                                <label for="secret" class="col-md-4 col-form-label text-end">Секретное слово:</label>
-                                <div class="col-md-8">
-                                    <input class="form-control" id="secret" name="secret" required>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row justify-content-center">
-                        <div class="col-md-6 text-center">
-                            <button type="submit" class="btn btn-primary btn-lg">Создать аккаунт</button>
-                        </div>
-                    </div>
-
-                </form>
-            </div>
-
-            <div id="passData" class="col" style="display: none; background-color: azure">
-                <span id="passwordData">
-                </span>
-            </div>
+                </div>
+                <div class="mb-3">
+                    <label for="secret" class="form-label">Секретное слово:</label>
+                    <input type="text" class="form-control" id="secret" name="secret" required>
+                </div>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary btn-lg">Создать аккаунт</button>
+                </div>
+            </form>
         </div>
 
+        <div id="passData" class="col-md-3" style="display: none; background-color: azure;">
+            <span id="passwordData"></span>
+        </div>
     </div>
-
-
 </div>
+
 <script src="/static/js/main.js"></script>
 <script>createAccount()</script>
 <script>addEventListenersForInputs()</script>
 </body>
+</html>
