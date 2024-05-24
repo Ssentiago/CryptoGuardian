@@ -3,6 +3,7 @@ import logging
 from typing import Optional
 
 from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 from starlette.responses import JSONResponse, Response
 
@@ -10,6 +11,7 @@ from backend.api_v1.schemas.service_schemas import PasswordSettings
 from backend.api_v1.schemas.user_schemas import UserSchema
 from backend.api_v1.views.credential_views import get_all_credentials
 from backend.auth.auth import access
+from backend.core import db_helper
 from backend.utils import (
     createResponce,
     generate_csv,
@@ -46,10 +48,12 @@ async def post_generate_password(password_settings: PasswordSettings):
 
 @router.get("/export")
 async def get_download(
-    user: UserSchema = Depends(access), all_data: dict = Depends(get_all_credentials)
+    user: UserSchema = Depends(access),
+    session: AsyncSession = Depends(db_helper.session_dependency),
 ):
-    if len(all_data) > 0:
-        content = generate_csv(all_data)
+    all_data = await get_all_credentials(user, session)
+    if len(all_data["data"]) > 1:
+        content = generate_csv(all_data["data"])
         response = Response(content=content, status_code=status.HTTP_200_OK)
         response.headers["Content-Type"] = "text/csv"
         response.headers["Content-Disposition"] = (
@@ -57,3 +61,4 @@ async def get_download(
         )
 
         return response
+    return createResponce(Response, status.HTTP_404_NOT_FOUND)
