@@ -1,4 +1,6 @@
 __pycache__/
 venv
 *.pyc
-database/db.db
+backend/database/db.db
+backend/auth/cert/
+
