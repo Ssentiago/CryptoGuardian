@@ -58,15 +58,13 @@ async def get_user_by_access_token(
         try:
             decoded_credential = decode_jwt(xxx_access_token)
         except InvalidTokenError as e:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+            return None
         validate_token_type(decoded_credential, ACCESS_TOKEN_TYPE)
         id: str | None = decoded_credential.get("sub")
         user: None | UserModel = await session.get(UserModel, id)
-        print(user)
         if user:
             return UserSchema.model_validate(user)
-    #     raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-    # raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+    return RedirectResponse(url="/auth/accessDenied")
 
 
 async def get_user_by_refresh_token(
@@ -77,12 +75,12 @@ async def get_user_by_refresh_token(
         try:
             decoded_credential = decode_jwt(xxx_refresh_token)
         except InvalidTokenError as e:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+            return RedirectResponse(url="/auth/sessionExpired")
 
         validate_token_type(decoded_credential, REFRESH_TOKEN_TYPE)
         id: str | None = decoded_credential.get("sub")
         user: None | UserModel = await session.get(UserModel, id)
         if user:
             return UserSchema.model_validate(user)
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+        return RedirectResponse(url="/auth/accessDenied")
     return RedirectResponse(url="/auth/accessDenied")

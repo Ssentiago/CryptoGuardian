@@ -3,6 +3,7 @@ import os
 
 from fastapi import APIRouter, Depends
 from starlette.requests import Request
+from starlette.responses import RedirectResponse
 from starlette.templating import Jinja2Templates
 
 from backend.api_v1.schemas.user_schemas import UserSchema
@@ -31,9 +32,11 @@ async def register(request: Request):
 
 @router.get("/change_password")
 async def get_change_password(request: Request, user: UserSchema = Depends(access)):
-    return templates.TemplateResponse(
-        "/auth/auth_change_password.html", {"request": request}
-    )
+    if user:
+        return templates.TemplateResponse(
+            "/auth/auth_change_password.html", {"request": request}
+        )
+    return RedirectResponse("/auth/accessDenied")
 
 
 @router.get("/forgot")
@@ -47,4 +50,11 @@ async def get_forgot(request: Request):
 async def get_access_denied(request: Request):
     return templates.TemplateResponse(
         "/auth/auth_access_denied.html", {"request": request}
+    )
+
+
+@router.get("/sessionExpired")
+def session_expired(request: Request):
+    return templates.TemplateResponse(
+        "/auth/session_expired.html", {"request": request}
     )
