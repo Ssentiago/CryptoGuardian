@@ -16,11 +16,11 @@ from starlette.responses import JSONResponse, Response
 
 from backend.core.log import *
 
-# from backend.core.models import Credential
-
 logger = logging.getLogger(__name__)
 
-# Credential
+env: Env = Env()
+env.read_env(None)
+cipher = Fernet(env("secret").encode("utf-8"))
 
 
 def db_hash(data):
@@ -84,11 +84,6 @@ async def get_pwned(password):
                 pwned += int(count)
         return f"Пароль был скомпроментирован {pwned} раз"
     return "Не удалось получить данные"
-
-
-env: Env = Env()
-env.read_env(None)
-cipher = Fernet(env("secret").encode("utf-8"))
 
 
 def regex_login(login):

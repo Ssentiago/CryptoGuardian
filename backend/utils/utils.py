@@ -7,12 +7,6 @@ import jwt
 from backend.core.config import settings
 
 
-# TODO: jwt
-# TODO: fix mobile version of site
-# TODO: find most responsible way to encrypt user data
-# TODO: views /main endpoint
-
-
 def encode_jwt(
     payload: dict,
     private_key: str = settings.auth_jwt.private_key_path.read_text(),
