@@ -3,4 +3,4 @@ venv
 *.pyc
 backend/database/db.db
 backend/auth/cert/
-
+node_modules/

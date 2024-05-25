@@ -320,6 +320,8 @@ async function retrieveAllLoginCredentials() {
   element = document.getElementById("passwordListContainer");
 
   element.innerHTML = table;
+  el = document.getElementById("tablecontainer");
+  el.style.display = "block";
 }
 
 function confirmDeleteAllLoginCredentials() {
