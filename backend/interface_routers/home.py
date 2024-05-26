@@ -1,4 +1,3 @@
-import logging
 import os
 
 from fastapi import APIRouter
@@ -7,13 +6,15 @@ from starlette.responses import FileResponse, RedirectResponse
 from starlette.templating import Jinja2Templates
 
 from backend.core.config import settings
+from backend.core.log_config import get_logger
+
+logger = get_logger(__name__)
 
 router = APIRouter()
 
 templates = Jinja2Templates(
     directory=os.path.join(settings.static_files_path, "templates")
 )
-logger = logging.getLogger(__name__)
 
 
 @router.get("/")
@@ -22,8 +23,7 @@ async def home(
 ):
     user = request.scope.get("user")
     if user:
-
-        return RedirectResponse("/main/")
+        return RedirectResponse("/protected/main")
     return templates.TemplateResponse("index.html", {"request": request})
 
 

@@ -1,43 +1,25 @@
 import datetime
-import logging
-from typing import Optional
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
-from starlette.responses import JSONResponse, Response
+from starlette.requests import Request
+from starlette.responses import Response
 
 from backend.api_v1.schemas.service_schemas import PasswordSettings
-from backend.api_v1.schemas.user_schemas import UserSchema
-from backend.api_v1.views.credential_views import get_all_credentials
-from backend.auth.auth import access
+from backend.api_v1.views.authorized_views.credential_views import get_all_credentials
 from backend.core import db_helper
+from backend.core.log_config import get_logger
 from backend.utils import (
     createResponce,
     generate_csv,
     generate_password,
-    get_pass_score,
-    get_pwned,
 )
 
 router = APIRouter()
 
-logger = logging.getLogger(__name__)
 
-
-@router.get("/passwordStrength/{password}")
-async def password_strength(password: Optional[str]):
-    if password:
-        score = get_pass_score(password)
-        pwned = await get_pwned(password)
-        logger.info(pwned)
-        logger.info(score)
-        return createResponce(
-            JSONResponse,
-            status.HTTP_200_OK,
-            {"password": password, "score": score, "pwned": pwned},
-        )
-    return createResponce(Response, status.HTTP_404_NOT_FOUND)
+logger = get_logger(__name__)
 
 
 @router.post("/generatePassword")
@@ -48,10 +30,11 @@ async def post_generate_password(password_settings: PasswordSettings):
 
 @router.get("/export")
 async def get_download(
-    user: UserSchema = Depends(access),
+    request: Request,
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
-    all_data = await get_all_credentials(user, session)
+    all_data = await get_all_credentials(request, session)
+    logger.info(all_data)
     if len(all_data["data"]) > 1:
         content = generate_csv(all_data["data"])
         response = Response(content=content, status_code=status.HTTP_200_OK)
@@ -61,4 +44,5 @@ async def get_download(
         )
 
         return response
+    logger.info("Нет данных для экспорта")
     return createResponce(Response, status.HTTP_404_NOT_FOUND)

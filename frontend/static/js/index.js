@@ -1,4 +1,4 @@
-function authenticateUser() {
+function handleLoginFormSubmission() {
   const loginForm = document.getElementById("loginForm");
   loginForm.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -6,7 +6,7 @@ function authenticateUser() {
     let username = document.getElementById("username").value;
     let password = document.getElementById("password").value;
 
-    const response = await fetch("/user/login", {
+    const response = await fetch("/login", {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -19,15 +19,20 @@ function authenticateUser() {
     });
 
     if (response.status === 200) {
-      displayToast(
+      showNotification(
         "Вы успешно вошли в систему",
         "Сейчас вы будете перенаправлены на страницу входа",
       );
+      const responseData = await response.json();
+      const accessToken = responseData.accessToken;
+      console.log("hello from handleLoginFormSubmission", accessToken);
+      localStorage.setItem("accessToken", accessToken);
+
       setTimeout(function () {
-        window.location.href = "/main";
+        window.location.replace("/protected/main");
       }, 3000);
     } else {
-      displayToast(
+      showNotification(
         "Что-то пошло не так...",
         "Проверьте логин и пароль",
         "error",
@@ -36,7 +41,7 @@ function authenticateUser() {
   });
 }
 
-function createAccount() {
+function handleRegistrationFormSubmission() {
   const loginForm = document.getElementById("RegisterForm");
   loginForm.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -45,8 +50,8 @@ function createAccount() {
     const password = document.getElementById("password").value;
     const secret = document.getElementById("secret").value;
 
-    if ((await checkRequirements()) === true) {
-      const response = await fetch("/user/register", {
+    if ((await validateInputRequirements()) === true) {
+      const response = await fetch("/register", {
         method: "POST",
         headers: {
           Accept: "application/json",
@@ -60,22 +65,22 @@ function createAccount() {
       });
 
       if (response.status === 200) {
-        displayToast(
+        showNotification(
           "Аккаунт успешно создан",
           "Сейчас вы будете перенаправлены на главную страницу",
         );
         setTimeout(function () {
-          window.location.href = "/";
+          window.location.replace("/");
         }, 3000);
       } else {
-        displayToast(
+        showNotification(
           "Что-то пошло не так...",
           "Произошла ошибка при обработке введенных данных. Пожалуйста, проверьте их и попробуйте еще раз.",
           "error",
         );
       }
     } else {
-      displayToast(
+      showNotification(
         "Проверьте ввод",
         "Ввши данные соответствуют не всем требованиям",
         "warning",
@@ -84,7 +89,7 @@ function createAccount() {
   });
 }
 
-async function validateUserForPasswordReset() {
+async function handlePasswordResetRequest() {
   let form = document.getElementById("forgotForm");
 
   form.addEventListener("submit", async (event) => {
@@ -92,7 +97,7 @@ async function validateUserForPasswordReset() {
     let username = document.getElementById("username").value;
     let secret = document.getElementById("secret").value;
 
-    const response = await fetch("/user/forgot", {
+    const response = await fetch("/forgot", {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -105,15 +110,15 @@ async function validateUserForPasswordReset() {
     });
 
     if (response.status === 200) {
-      displayToast(
+      showNotification(
         "Валидация прошла успешно",
         "Сейчас вы будете перенаправлены на страницу смены пароля",
       );
       setTimeout(function () {
-        window.location.href = "/auth/change_password";
+        window.location.replace("/protected/change_password");
       }, 2000);
     } else {
-      displayToast(
+      showNotification(
         "Пользователь не найден в системе",
         "Попробуйте ещё раз",
         "error",
@@ -122,7 +127,7 @@ async function validateUserForPasswordReset() {
   });
 }
 
-async function changePassword() {
+async function handleChangePasswordFormSubmission() {
   const form = document.getElementById("ChangeForm");
 
   form.addEventListener("submit", async (event) => {
@@ -132,9 +137,9 @@ async function changePassword() {
     const password2 = document.getElementById("pass2").value;
 
     if (password1 !== password2) {
-      displayToast("Пароли не совпадают", "", "error");
+      showNotification("Пароли не совпадают", "", "error");
     } else {
-      const response = await fetch("/user/change_password", {
+      const response = await fetch("/protected/user/change_password", {
         method: "POST",
         headers: {
           Accept: "application/json",
@@ -146,35 +151,39 @@ async function changePassword() {
       });
 
       if (response.status === 200) {
-        displayToast(
+        showNotification(
           "Смена пароля произошла успешно",
           "Сейчас вы будете перенаправлены на главную страницу",
         );
         setTimeout(function () {
-          window.location.href = "/main/";
+          window.location.replace("/protected/main");
         }, 2000);
       } else {
-        displayToast("Ваш пароль содержит некорректные данные", "", "error");
+        showNotification(
+          "Ваш пароль содержит некорректные данные",
+          "",
+          "error",
+        );
       }
     }
   });
 }
 
-async function logout() {
-  displayToast("До встречи!", "", "");
+async function handleLogout() {
+  showNotification("До встречи!", "", "");
 
-  const response = await fetch("/user/logout", {
+  const response = await fetch("/protected/user/service/logout", {
     method: "GET",
   });
 
   if (response.status === 200) {
     setTimeout(async function () {
-      window.location.href = "/";
+      window.location.replace("/");
     }, 2000);
   }
 }
 
-async function generatePassword() {
+async function handlePasswordGeneration() {
   const generateOutput = document.getElementById("generatedPassword");
   const scoreOutput = document.getElementById("score");
   const pwnedOutput = document.getElementById("pwned");
@@ -192,9 +201,9 @@ async function generatePassword() {
   let include_spec = document.getElementById("includeSpecialSymbols").checked;
   let check = includeLows || includeUps || include_digs || include_spec;
   if (!check) {
-    displayToast("Вы не отметили ни одного чекбокса", "", "warning");
+    showNotification("Вы не отметили ни одного чекбокса", "", "warning");
   } else {
-    const response = await fetch("/user/service/generatePassword", {
+    const response = await fetch("/protected/user/service/generatePassword", {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -215,7 +224,7 @@ async function generatePassword() {
   }
 }
 
-function displayToast(title, content = "", icon = "success") {
+function showNotification(title, content = "", icon = "success") {
   return Swal.mixin({
     toast: true,
     position: "top-end",
@@ -233,7 +242,7 @@ function displayToast(title, content = "", icon = "success") {
   });
 }
 
-async function addLoginCredentials() {
+async function handleCredentialAddition() {
   let el1 = document.getElementById("AddServiceName");
   let el2 = document.getElementById("AddLogin");
   let el3 = document.getElementById("AddPassword");
@@ -242,7 +251,7 @@ async function addLoginCredentials() {
   let password = el3.value;
 
   if (serviceName && login_ && password) {
-    const response = await fetch("/credential/add", {
+    const response = await fetch("/protected/credential/add", {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -261,28 +270,28 @@ async function addLoginCredentials() {
       el2.value = "";
       el3.value = "";
 
-      displayToast("Данные были успешно добавлены в базу");
-      await updatePasswordsListAndHeaderCounter();
+      showNotification("Данные были успешно добавлены в базу");
+      await updatePasswordListAndCounter();
     } else {
-      displayToast(
+      showNotification(
         "Что-то пошло не так...",
         "Проверьте введённые данные. Возможно, такая связка Сервис-Логин уже есть в базе",
         "error",
       );
     }
   } else {
-    displayToast("Заполните все поля ввода", "", "warning");
+    showNotification("Заполните все поля ввода", "", "warning");
   }
 }
 
-async function deleteLoginCredentials() {
+async function handleCredentialDeletion() {
   let el1 = document.getElementById("DeleteServiceName");
   let el2 = document.getElementById("DeleteLogin");
   let serviceName = el1.value;
   let login_ = el2.value;
 
   if (serviceName && login_) {
-    const response = await fetch("/credential/delete", {
+    const response = await fetch("/protected/credential/delete", {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -296,18 +305,20 @@ async function deleteLoginCredentials() {
     });
 
     if (response.status === 200) {
-      displayToast("Данные были успешно удалены из базы");
+      showNotification("Данные были успешно удалены из базы");
       el1.value = "";
       el2.value = "";
-      await updatePasswordsListAndHeaderCounter();
+      await updatePasswordListAndCounter();
+    } else {
+      showNotification("Такая запись не была найдена в базе", "", "warning");
     }
   } else {
-    displayToast("Заполните все поля ввода!", "", "warning");
+    showNotification("Заполните все поля ввода!", "", "warning");
   }
 }
 
-async function retrieveAllLoginCredentials() {
-  const response = await fetch("/credential/get_all", {
+async function fetchAllCredentials() {
+  const response = await fetch("/protected/credential/get_all", {
     method: "GET",
     headers: { Accept: "application/json", "Content-Type": "application/json" },
     body: null,
@@ -315,7 +326,7 @@ async function retrieveAllLoginCredentials() {
 
   const responseData = await response.json();
   let data = responseData.data;
-  table = generateTable(data);
+  table = generateHTMLTable(data);
 
   element = document.getElementById("passwordListContainer");
 
@@ -324,7 +335,7 @@ async function retrieveAllLoginCredentials() {
   el.style.display = "block";
 }
 
-function confirmDeleteAllLoginCredentials() {
+function confirmDeleteAllCredentials() {
   Swal.fire({
     title: "Удалить все сохранённые данные?",
     text: "Внимание! Эта операция необратима!",
@@ -342,18 +353,21 @@ function confirmDeleteAllLoginCredentials() {
 }
 
 async function deleteAllLoginCredentials() {
-  const response = await fetch("/credential/delete_all", {
+  const response = await fetch("/protected/credential/delete_all", {
     method: "GET",
     headers: { Accept: "application/json", "Content-Type": "application/json" },
   });
 
   if (response.status === 200) {
-    displayToast("Удаление данных", "Все ваши данные успешно удалены из базы");
-    await updatePasswordsListAndHeaderCounter();
+    showNotification(
+      "Удаление данных",
+      "Все ваши данные успешно удалены из базы",
+    );
+    await updatePasswordListAndCounter();
   }
 }
 
-function toggdlePassword(id) {
+function togglePasswordVisibility(id) {
   let pass = document.getElementById(id);
   if (pass.type === "password") {
     pass.type = "text";
@@ -362,8 +376,8 @@ function toggdlePassword(id) {
   }
 }
 
-async function exportData() {
-  const responce = await fetch("/user/service/export", {
+async function exportUserData() {
+  const responce = await fetch("/protected/user/service/export", {
     method: "GET",
   });
 
@@ -383,9 +397,9 @@ async function exportData() {
     a.click();
     window.URL.revokeObjectURL(url);
   } else if (responce.status === 404) {
-    displayToast("У вас пока нет данных для скачивания", "", "info");
+    showNotification("У вас пока нет данных для скачивания", "", "info");
   } else {
-    displayToast(
+    showNotification(
       "Во время скачивания файла произошла ошибка",
       "Если подобное повторится, обратитесь к администратору сайта",
       "error",
@@ -393,7 +407,7 @@ async function exportData() {
   }
 }
 
-function generateTable(data) {
+function generateHTMLTable(data) {
   let table = "<table><thread><tr>";
 
   data[0].forEach((element) => {
@@ -415,13 +429,13 @@ function generateTable(data) {
   return table;
 }
 
-async function fetchPasswordStrengthAndPwns(password) {
+async function fetchPasswordInfo(password) {
   el = document.getElementById("passwordData");
   container = document.getElementById("passData");
   container.style.display = "inline";
   el.innerHTML = "Проверяем силу пароля и был ли он слит...";
 
-  const response = await fetch("/user/service/passwordStrength/" + password, {
+  const response = await fetch("/passwordStrength/" + password, {
     method: "GET",
     body: null,
   });
@@ -441,7 +455,7 @@ async function fetchPasswordStrengthAndPwns(password) {
   }
 }
 
-async function addEventListenersForInputs() {
+async function addInputEventListeners() {
   //  прослушиваем событие наведения мыши на контейнер с формой RegisterForm
   form = document.getElementById("RegisterForm");
   req = document.getElementById("requirements");
@@ -454,48 +468,48 @@ async function addEventListenersForInputs() {
 
   // прослушиватели поля логина
   log_inp = document.getElementById("username");
-  log_inp.addEventListener("input", logTooltips);
+  log_inp.addEventListener("input", showLoginTooltips);
   // прослушиватели полей пароля
   pass1 = document.getElementById("password");
   pass2 = document.getElementById("passwordAgain");
 
-  pass1.addEventListener("input", passwordTooltips);
-  pass2.addEventListener("input", passwordTooltips);
+  pass1.addEventListener("input", showPasswordTooltips);
+  pass2.addEventListener("input", showPasswordTooltips);
 
   // прослушиватель поля секретного слова
   secret = document.getElementById("secret");
 
-  secret.addEventListener("input", secretTooltips);
+  secret.addEventListener("input", showSecretTooltips);
 }
 
-async function changeClass(obj, bef, aft) {
+async function changeElementClass(obj, bef, aft) {
   obj.classList.remove(bef);
   obj.classList.add(aft);
 }
 
-async function logTooltips(event) {
+async function showLoginTooltips(event) {
   el_login = event.currentTarget;
   el_value = el_login.value;
   tooltip_val = document.getElementById("logVals");
 
   if (el_value.trim() !== "") {
     if (el_value.match(/^[0-9a-zA-Z!@#$%&*_.-]+$/)) {
-      changeClass(tooltip_val, "invalid", "valid");
+      changeElementClass(tooltip_val, "invalid", "valid");
     } else {
-      changeClass(tooltip_val, "valid", "invalid");
+      changeElementClass(tooltip_val, "valid", "invalid");
     }
   } else {
-    changeClass(tooltip_val, "invalid", "valid");
+    changeElementClass(tooltip_val, "invalid", "valid");
   }
   tooltip_length = document.getElementById("logLength");
   if (el_value.length >= 3) {
-    changeClass(tooltip_length, "invalid", "valid");
+    changeElementClass(tooltip_length, "invalid", "valid");
   } else {
-    changeClass(tooltip_length, "valid", "invalid");
+    changeElementClass(tooltip_length, "valid", "invalid");
   }
 }
 
-async function passwordTooltips(event) {
+async function showPasswordTooltips(event) {
   pass_1 = document.getElementById("password");
   pass_2 = document.getElementById("passwordAgain");
 
@@ -504,60 +518,66 @@ async function passwordTooltips(event) {
 
   pass_same = document.getElementById("passSame");
   if (pass1_value === pass2_value) {
-    changeClass(pass_same, "invalid", "valid");
+    changeElementClass(pass_same, "invalid", "valid");
   } else {
-    changeClass(pass_same, "valid", "invalid");
+    changeElementClass(pass_same, "valid", "invalid");
   }
 
   pass_length = document.getElementById("passLength");
 
   if (pass_same.classList.contains("valid")) {
     if (pass1_value.length >= 8) {
-      changeClass(pass_length, "invalid", "valid");
+      changeElementClass(pass_length, "invalid", "valid");
     } else {
-      changeClass(pass_length, "valid", "invalid");
+      changeElementClass(pass_length, "valid", "invalid");
     }
 
     passVals = document.getElementById("passVals");
     if (pass1_value.match(/^[0-9a-zA-Z!@#$%&*_.-]+$/)) {
-      changeClass(passVals, "invalid", "valid");
+      changeElementClass(passVals, "invalid", "valid");
     } else {
-      changeClass(passVals, "valid", "invalid");
+      changeElementClass(passVals, "valid", "invalid");
     }
 
     passReqs = document.getElementById("passReqs");
     if (pass1_value.match(/(?=.*[a-zA-Z])(?=.*[0-9])/)) {
-      changeClass(passReqs, "invalid", "valid");
+      changeElementClass(passReqs, "invalid", "valid");
     } else {
-      changeClass(passReqs, "valid", "invalid");
+      changeElementClass(passReqs, "valid", "invalid");
     }
 
     passReqs = document
       .getElementById("requirements")
       .querySelectorAll('[id^="pass"]');
-    if ((await checkValidPassReqs(passReqs)) === true) {
-      await fetchPasswordStrengthAndPwns(pass1_value);
+    if ((await validatePasswordRequirements(passReqs)) === true) {
+      await fetchPasswordInfo(pass1_value);
     }
   }
 }
 
-async function secretTooltips(event) {
+async function showSecretTooltips(event) {
   secret = document.getElementById("secret");
   secret_value = secret.value;
 
   secretVals = document.getElementById("secretVals");
+  secretLength = document.getElementById("secretLength");
   if (secret_value !== "") {
-    if (secret_value.match(/^[a-zA-Zа-яА-Я0-9!@#$%&*_.-]+$/)) {
-      changeClass(secretVals, "invalid", "valid");
+    if (secret.value.length > 2) {
+      changeElementClass(secretLength, "invalid", "valid");
     } else {
-      changeClass(secretVals, "valid", "invalid");
+      changeElementClass(secretLength, "valid", "invalid");
+    }
+    if (secret_value.match(/^[a-zA-Zа-яА-Я0-9!@#$%&*_.-]+$/)) {
+      changeElementClass(secretVals, "invalid", "valid");
+    } else {
+      changeElementClass(secretVals, "valid", "invalid");
     }
   } else {
-    changeClass(secretVals, "invalid", "valid");
+    changeElementClass(secretVals, "invalid", "valid");
   }
 }
 
-async function checkRequirements() {
+async function validateInputRequirements() {
   reqs = document.getElementById("requirements");
   req_lis = reqs.querySelectorAll("li");
 
@@ -569,7 +589,7 @@ async function checkRequirements() {
   return true;
 }
 
-async function checkValidPassReqs(req) {
+async function validatePasswordRequirements(req) {
   for (let i = 0; i < req.length; i++) {
     if (req[i].classList.contains("invalid")) {
       return false;
@@ -596,7 +616,7 @@ function CreateAjaxRequest() {
   return Request;
 }
 
-function SendRequest(method, path, args, handler) {
+function sendAjaxRequest(method, path, args, handler) {
   // Создаём запрос
   var Request = CreateAjaxRequest();
 
@@ -621,25 +641,25 @@ function SendRequest(method, path, args, handler) {
   Request.send();
 }
 
-async function updatePasswordsListAndHeaderCounter() {
+async function updatePasswordListAndCounter() {
   var handler = async function (Request) {
     if (Request.status === 200) {
       responseData = JSON.parse(Request.responseText);
       let data = responseData.data;
       console.log(data.length);
-      table = generateTable(data);
+      table = generateHTMLTable(data);
       document.getElementById("passwordListContainer").innerHTML = table;
       document.getElementById("passwordsCounter").textContent =
-        await convertJinjaVarForAjax(data.length);
+        await formatDataForAjax(data.length);
     } else {
       console.error("Failed to update passwords list.");
     }
   };
 
-  SendRequest("GET", "/credential/get_all", "", handler);
+  sendAjaxRequest("GET", "/protected/credential/get_all", "", handler);
 }
 
-async function convertJinjaVarForAjax(count) {
+async function formatDataForAjax(count) {
   if (count === 0) {
     return "У вас пока не сохранено никаких паролей";
   } else if (count === 1) {
@@ -648,5 +668,45 @@ async function convertJinjaVarForAjax(count) {
     return "У вас сохранено " + count + " пароля";
   } else {
     return "У вас сохранено " + count + " паролей";
+  }
+}
+
+function isNotJTokenExpired(token) {
+  const decoded_token_parts = token.split(".");
+  const [_, payload, __] = decoded_token_parts;
+  const decoded_payload = atob(payload);
+  const json_payload = JSON.parse(decoded_payload);
+  console.log("PAYLOAD:", json_payload);
+  const exp_in_date = unixTimeToHumanDate(json_payload.exp);
+  const now = new Date();
+  console.log("NOW IS LESS THAN EXP_IN:", now < exp_in_date);
+  console.log("NOW:", now.toLocaleString());
+  console.log("EXP_IN", exp_in_date.toLocaleString());
+  return now < exp_in_date;
+}
+
+function unixTimeToHumanDate(timestamp) {
+  const date = new Date(timestamp * 1000);
+  return date;
+}
+
+async function authorizeWrapper(func, ...args) {
+  const token = localStorage.getItem("accessToken");
+  if (isNotJTokenExpired(token)) {
+    return func(...args);
+  } else {
+    const response = await fetch("/AUTH/refresh", {
+      method: "POST",
+      contentType: "application/json",
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+      body: null,
+    });
+    if (response.status === 200) {
+      return func(...args);
+    } else {
+      // to-do
+    }
   }
 }

@@ -1,4 +1,3 @@
-import logging
 import os
 
 from fastapi import APIRouter
@@ -6,13 +5,15 @@ from starlette.requests import Request
 from starlette.templating import Jinja2Templates
 
 from backend.core.config import settings
+from backend.core.log_config import get_logger
+
+logger = get_logger(__name__)
 
 router = APIRouter()
 
 templates = Jinja2Templates(
     directory=os.path.join(settings.static_files_path, "templates")
 )
-logger = logging.getLogger(__name__)
 
 
 @router.get("/login")
@@ -44,3 +45,11 @@ def session_expired(request: Request):
     return templates.TemplateResponse(
         "/auth/session_expired.html", {"request": request}
     )
+
+
+@router.get("/doc")
+async def get_user_info(request: Request):
+    # Получение IP-адреса
+    client_ip = request.client.host
+    if client_ip == "127.0.0.1":
+        ...

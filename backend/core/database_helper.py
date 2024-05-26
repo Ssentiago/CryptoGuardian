@@ -1,5 +1,6 @@
 import logging
 from asyncio import current_task
+from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
 from sqlalchemy.ext.asyncio import (
@@ -33,6 +34,14 @@ class DataBaseHelper:
         session = await self.get_scope_session()
         yield session
         await session.close()
+
+    @asynccontextmanager
+    async def session_context(self):
+        session = await self.get_scope_session()
+        try:
+            yield session
+        finally:
+            await session.close()
 
 
 db_helper = DataBaseHelper(url=settings.Database.db_url)

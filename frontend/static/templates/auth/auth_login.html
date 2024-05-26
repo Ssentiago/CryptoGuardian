@@ -22,20 +22,20 @@
                     <label for="password" class="form-label">Пароль:</label>
                     <input type="password" class="form-control" id="password" name="password" required>
                     <label>
-                        <input type="checkbox" onclick="toggdlePassword('password')"> Показать пароль
+                        <input type="checkbox" onclick="togglePasswordVisibility('password')"> Показать пароль
                     </label>
                 </div>
                 <div class="d-grid gap-2">
                     <button type="submit" class="btn btn-primary">Войти на сайт</button>
-                    <button class="btn btn-secondary" onclick="window.location.href = '/auth/forgot'">Забыли пароль?</button>
+                    <button class="btn btn-secondary" onclick="window.location.href = '/forgot'">Забыли пароль?</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-<script src="/static/js/main.js"></script>
-<script>authenticateUser()</script>
+<script src="/static/js/index.js"></script>
+<script>handleLoginFormSubmission()</script>
 
 
 </body>

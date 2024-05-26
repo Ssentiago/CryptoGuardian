@@ -19,9 +19,9 @@
 <div class="container mt-5">
     <div class="container mt-5">
         <div class="col-12" style="text-align: right">
-            <button id="downloadMyData" class="btn bg-success me-2" style="color: #dddddd" onclick="exportData()">📥 Скачать мои данные
+            <button id="downloadMyData" class="btn bg-success me-2" style="color: #dddddd" onclick="exportUserData()">📥 Скачать мои данные
             </button>
-            <button id="logout" onclick="logout()" class="btn btn-danger">Выйти</button>
+            <button id="logout" onclick="handleLogout()" class="btn btn-danger">Выйти</button>
         </div>
         <h1 style="text-align: center;">
             Добро пожаловать, <span id="catch_user" class="mt-3">{{ user_name }}</span>!
@@ -66,7 +66,7 @@
                     </div>
                     <div class="row align-items-center">
                         <div class="col-auto">
-                            <button id="generateButton" onclick="generatePassword()" class="btn btn-primary">Генерация</button>
+                            <button id="generateButton" onclick="handlePasswordGeneration()" class="btn btn-primary">Генерация</button>
                         </div>
                         <div class="col-5">
                             <span style="background-color: #f0f0f0; border: 1px solid #ccc;" id="generatedPassword"
@@ -98,7 +98,7 @@
                             </div>
                             <input type="text" id="AddPassword" placeholder="Введите пароль" class="form-control">
                         </div>
-                        <button id="addNewButton" onclick="addLoginCredentials()" class="btn btn-success">Добавить</button>
+                        <button id="addNewButton" onclick="handleCredentialAddition()" class="btn btn-success">Добавить</button>
                     </div>
                 </div>
                 <div class="row-cols-md-6 ms-2">
@@ -115,7 +115,7 @@
                             </div>
                             <input type="text" id="DeleteLogin" placeholder="Введите логин" class="form-control">
                         </div>
-                        <button id="deleteButton" onclick="deleteLoginCredentials()" class="btn btn-danger">Удалить</button>
+                        <button id="deleteButton" onclick="handleCredentialDeletion()" class="btn btn-danger">Удалить</button>
                     </div>
                 </div>
             </div>
@@ -127,10 +127,10 @@
                 <div class="col-md-6">
                     <div class="row">
                         <div class="col">
-                            <button id="showButton" onclick="retrieveAllLoginCredentials()" class="btn btn-primary me-2 mb-2">Вывести
+                            <button id="showButton" onclick="fetchAllCredentials()" class="btn btn-primary me-2 mb-2">Вывести
                                 сохранённые данные
                             </button>
-                            <button id="delAllDataButton" onclick="confirmDeleteAllLoginCredentials()" class="btn btn-danger mb-2">
+                            <button id="delAllDataButton" onclick="confirmDeleteAllCredentials()" class="btn btn-danger mb-2">
                                 Удалить все сохранённые данные
                             </button>
                         </div>
@@ -146,7 +146,7 @@
 </div>
 
 
-<script src="/static/js/main.js"></script>
+<script src="/static/js/index.js"></script>
 
 </body>
 </html>

@@ -4,6 +4,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from backend.api_v1.schemas.credential_schemas import CredentialCreate, CredentialDelete
 from backend.api_v1.schemas.user_schemas import UserSchema
 from backend.core import Credential
+from backend.core.log_config import get_logger
+
+logger = get_logger(__name__)
 
 
 async def create_credential(
@@ -31,8 +34,11 @@ async def delete_credential(
     )
     raw = await session.execute(stat)
     credential = raw.scalar()
-    await session.delete(credential)
-    await session.commit()
+    if credential:
+        await session.delete(credential)
+        await session.commit()
+        return True
+    logger.info("Нечего удалять")
 
 
 async def get_all_credentials(

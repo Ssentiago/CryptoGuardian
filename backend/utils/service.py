@@ -2,7 +2,6 @@ import csv
 import hashlib
 import io
 import itertools
-import re
 import secrets
 import string
 from typing import Optional
@@ -14,9 +13,9 @@ from cryptography.fernet import Fernet
 from environs import Env
 from starlette.responses import JSONResponse, Response
 
-from backend.core.log import *
+from backend.core.log_config import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 env: Env = Env()
 env.read_env(None)
@@ -86,20 +85,20 @@ async def get_pwned(password):
     return "Не удалось получить данные"
 
 
-def regex_login(login):
-    return bool(re.fullmatch(r"[0-9a-zA-Z!@#$%&*_.-]{3,}", login))
-
-
-def regex_password(password):
-    return bool(
-        re.fullmatch(
-            r"^(?=.+[A-Za-z])(?=.+[0-9])(?=\S+$)[0-9a-zA-Z!@#$%&*_.-]{8,}$", password
-        )
-    )
-
-
-def regex_secret(secret):
-    return bool(re.fullmatch(r"[0-9a-zA-Zа-яА-Я!@#$%&*_.-]+", secret))
+# def regex_login(login):
+#     return bool(re.fullmatch(r"[0-9a-zA-Z!@#$%&*_.-]{3,}", login))
+#
+#
+# def regex_password(password):
+#     return bool(
+#         re.fullmatch(
+#             r"^(?=.+[A-Za-z])(?=.+[0-9])(?=\S+$)[0-9a-zA-Z!@#$%&*_.-]{8,}$", password
+#         )
+#     )
+#
+#
+# def regex_secret(secret):
+#     return bool(re.fullmatch(r"[0-9a-zA-Zа-яА-Я!@#$%&*_.-]+", secret))
 
 
 def createResponce(
@@ -122,7 +121,6 @@ def createResponce(
 def generate_csv(data: list[tuple[str]]) -> str:
     output = io.StringIO()
     writer = csv.writer(output)
-    writer.writerow(("#", "Имя сервиса", "Логин", "Пароль"))
     writer.writerows(data)
 
     return output.getvalue().encode("utf-8")

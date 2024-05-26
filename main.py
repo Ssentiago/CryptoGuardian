@@ -1,16 +1,19 @@
-import logging
 from contextlib import asynccontextmanager
 
 import uvicorn
 from fastapi import FastAPI
-from starlette.requests import Request
 from starlette.staticfiles import StaticFiles
 
 from backend.api_v1 import API
-from backend.auth.auth import router as AUTH
 from backend.core import Base, db_helper
 from backend.core.config import settings
-from backend.interface import interface_router
+from backend.core.log_config import get_logger
+from backend.interface_routers import interface_router
+from backend.jwt_authorization.authorization_middleware import AuthorizationMiddleware
+from backend.jwt_authorization.generate_tokens import router as AUTH
+from backend.utils.logging_middleware import log_request
+
+logger = get_logger(__name__)
 
 
 @asynccontextmanager
@@ -21,36 +24,44 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(lifespan=lifespan, title=settings.API_PROJECT_NAME)
-app.mount("/static", StaticFiles(directory=settings.static_files_path), name="static")
+# protected: требуют от пользователя наличие токена доступа (обязательно наличие токена refresh!)
+# non-protected: не требуют от пользователя наличие токена доступа. Можно посещать без ограничений.
+tags_metadata = [
+    {
+        "name": "credential",
+        "description": "Операции с пользовательскими данными. Protected",
+    },
+    {"name": "user", "description": "Операции с пользователями. Protected"},
+    {"name": "AUTH", "description": "Модуль аутентификации. Non-protected"},
+    {"name": "default", "description": "Операции по умолчанию. Non-protected"},
+]
 
-logger = logging.getLogger(__name__)
+
+app = FastAPI(
+    lifespan=lifespan,
+    title=settings.API_PROJECT_NAME,
+    redoc_url=None,
+    openapi_tags=tags_metadata,
+)
+app.mount("/static", StaticFiles(directory=settings.static_files_path), name="static")
 
 
 app.include_router(API)
 app.include_router(AUTH)
 app.include_router(interface_router)
+app.middleware("http")(log_request)
 
-
-@app.middleware("http")
-async def log_request(request: Request, call_next):
-    # Логируем информацию о запросе
-    print(f"Received request:")
-    print(f"Method: {request.method}")
-    print(f"URL: {request.url}")
-    print(f"Client host: {request.client.host}")
-    print(f"Headers: {request.headers}")
-    print(f"Query parameters: {request.query_params}")
-    print(f"Path parameters: {request.path_params}")
-    print(f"Query string: {request.query_params}")
-    print(f"Body: {await request.body()}")
-
-    response = await call_next(request)
-
-    print(f"Responded with status code: {response.status_code}")
-
-    return response
+app.add_middleware(
+    AuthorizationMiddleware,
+)
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+    for route in app.routes:
+        logger.info(f"{route.path} ---> {route.name})")
+    uvicorn.run(
+        "main:app",
+        host="127.0.0.1",
+        port=8000,
+        reload=True,
+    )

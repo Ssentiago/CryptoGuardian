@@ -19,7 +19,7 @@ class User(Base):
     username = Column(String, unique=True)
     password = Column(String)
     secret = Column(String)
-    created = Column(String, default=datetime.utcnow)
+    created = Column(String, default=datetime.utcnow())
     updated = Column(String)
 
     def __init__(self, username, password, secret):
@@ -29,7 +29,6 @@ class User(Base):
 
 
 class Credential(Base):
-    id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey("user.id"))
     service = Column(String)
     username = Column(String)
@@ -49,7 +48,11 @@ class Credential(Base):
             return super().__getattribute__(item)
 
 
-class Token(Base):
-    id = Column(Integer, primary_key=True, autoincrement=True)
+class ClientSession(Base):
     user_id = Column(Integer, ForeignKey("user.id"))
-    value = Column(String)
+    refresh_token = Column(String, unique=True)
+    user_agent = Column(String)
+    fingerprint = Column(String)
+    ip = Column(String)
+    expiresIn = Column(Integer)
+    createdAt = Column(String, default=datetime.now())
