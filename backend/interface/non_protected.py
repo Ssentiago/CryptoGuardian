@@ -1,13 +1,10 @@
 import logging
 import os
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 from starlette.requests import Request
-from starlette.responses import RedirectResponse
 from starlette.templating import Jinja2Templates
 
-from backend.api_v1.schemas.user_schemas import UserSchema
-from backend.auth.auth import access
 from backend.core.config import settings
 
 router = APIRouter()
@@ -16,8 +13,6 @@ templates = Jinja2Templates(
     directory=os.path.join(settings.static_files_path, "templates")
 )
 logger = logging.getLogger(__name__)
-
-print(os.path.join(settings.static_files_path, "templates"))
 
 
 @router.get("/login")
@@ -28,15 +23,6 @@ async def login(request: Request):
 @router.get("/register")
 async def register(request: Request):
     return templates.TemplateResponse("/auth/auth_register.html", {"request": request})
-
-
-@router.get("/change_password")
-async def get_change_password(request: Request, user: UserSchema = Depends(access)):
-    if user:
-        return templates.TemplateResponse(
-            "/auth/auth_change_password.html", {"request": request}
-        )
-    return RedirectResponse("/auth/accessDenied")
 
 
 @router.get("/forgot")
