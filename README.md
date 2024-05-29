@@ -34,4 +34,4 @@
 
 ### Скриншот главной страницы сайта:
 
-![CryptoGuardian main](https://imgur.com/a/YS60nvV)
+[![CryptoGuardian main](https://i.postimg.cc/MKYV9WGN/image.png)](https://postimg.cc/QHHFtZ1J)
