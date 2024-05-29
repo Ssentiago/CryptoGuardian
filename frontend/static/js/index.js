@@ -23,10 +23,6 @@ function handleLoginFormSubmission() {
         "Вы успешно вошли в систему",
         "Сейчас вы будете перенаправлены на страницу входа",
       );
-      const responseData = await response.json();
-      const accessToken = responseData.accessToken;
-      console.log("hello from handleLoginFormSubmission", accessToken);
-      localStorage.setItem("accessToken", accessToken);
 
       setTimeout(function () {
         window.location.replace("/protected/main");
@@ -668,45 +664,5 @@ async function formatDataForAjax(count) {
     return "У вас сохранено " + count + " пароля";
   } else {
     return "У вас сохранено " + count + " паролей";
-  }
-}
-
-function isNotJTokenExpired(token) {
-  const decoded_token_parts = token.split(".");
-  const [_, payload, __] = decoded_token_parts;
-  const decoded_payload = atob(payload);
-  const json_payload = JSON.parse(decoded_payload);
-  console.log("PAYLOAD:", json_payload);
-  const exp_in_date = unixTimeToHumanDate(json_payload.exp);
-  const now = new Date();
-  console.log("NOW IS LESS THAN EXP_IN:", now < exp_in_date);
-  console.log("NOW:", now.toLocaleString());
-  console.log("EXP_IN", exp_in_date.toLocaleString());
-  return now < exp_in_date;
-}
-
-function unixTimeToHumanDate(timestamp) {
-  const date = new Date(timestamp * 1000);
-  return date;
-}
-
-async function authorizeWrapper(func, ...args) {
-  const token = localStorage.getItem("accessToken");
-  if (isNotJTokenExpired(token)) {
-    return func(...args);
-  } else {
-    const response = await fetch("/AUTH/refresh", {
-      method: "POST",
-      contentType: "application/json",
-      headers: {
-        Authorization: "Bearer " + token,
-      },
-      body: null,
-    });
-    if (response.status === 200) {
-      return func(...args);
-    } else {
-      // to-do
-    }
   }
 }

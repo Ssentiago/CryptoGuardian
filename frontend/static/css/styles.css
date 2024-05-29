@@ -79,18 +79,18 @@ label {
 
 #passData {
     display: block;
-    width: 200px; /* Уменьшенный размер */
+    width: 200px;
     height: 100px;
-    margin: 5px 0; /* Уменьшенный отступ */
-    padding: 5px; /* Уменьшенный padding */
+    margin: 5px 0;
+    padding: 5px;
     border: 1px solid #ccc;
-    background-color: #f2f2f2; /* Светлый фон */
+    background-color: #f2f2f2;
     font-family: Arial, sans-serif;
-    font-size: 16px; /* Увеличенный размер шрифта */
+    font-size: 16px;
     color: #333;
     text-align: left;
-    line-height: 1.6; /* Увеличенное межстрочное расстояние */
-    border-radius: 10px; /* Более округленные углы */
+    line-height: 1.6;
+    border-radius: 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 

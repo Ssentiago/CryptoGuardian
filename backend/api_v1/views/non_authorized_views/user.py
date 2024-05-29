@@ -32,9 +32,8 @@ def login_into(
     token: TokenInfo = Depends(gen_token_by_login),
 ):
     response = createResponce(
-        JSONResponse,
+        Response,
         status_code=status.HTTP_200_OK,
-        data={"accessToken": token.access_token},
     )
     response.set_cookie(
         key="xxx_access_token",
