@@ -20,9 +20,7 @@ class ColoredFormatter(logging.Formatter):
     red = "\x1b[91m"  # Красный
     bold_red = "\x1b[91;1m"  # Жирный красный
     reset = "\x1b[0m"  # Сброс цвета
-    format = (
-        "[{asctime}] #{levelname:8} {filename}:{lineno}:{funcName} - {name} - {message}"
-    )
+    format = "[{asctime}] #{levelname:8} | in: {filename}:{lineno}:{funcName} | fr: {name} | m: {message}"
     FORMATS = {
         logging.DEBUG: grey + format + reset,
         logging.INFO: green + format + reset,
@@ -38,9 +36,7 @@ class ColoredFormatter(logging.Formatter):
 
 
 class PlainFormatter(logging.Formatter):
-    format = (
-        "[{asctime}] #{levelname:8} {filename}:{lineno}:{funcName} - {name} - {message}"
-    )
+    format = "[{asctime}] #{levelname:8} | in: {filename}:{lineno}:{funcName} | fr: {name} | m: {message}"
     FORMATS = {
         logging.DEBUG: format,
         logging.INFO: format,
